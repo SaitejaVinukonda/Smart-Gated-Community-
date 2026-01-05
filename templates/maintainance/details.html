@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Maintenance Details{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1 gradient-text">Maintenance Request</h1>
+            <p class="text-secondary mb-0">
+                Track assignment and progress with ML‑based staff selection.
+            </p>
+        </div>
+        <a href="/maintainance/create/" class="btn btn-sm btn-outline-success">
+            <i class="fa-solid fa-plus me-1"></i>New Request
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card card-glass shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0 text-light">
+                            <i class="fa-solid fa-wrench me-2 text-success"></i>
+                            {{ request_obj.title }}
+                        </h2>
+                        <span class="badge
+                            {% if request_obj.status == 'OPEN' %}bg-warning text-dark
+                            {% elif request_obj.status == 'ASSIGNED' %}bg-info text-dark
+                            {% elif request_obj.status == 'IN_PROGRESS' %}bg-primary
+                            {% else %}bg-success{% endif %}">
+                            {{ request_obj.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <small class="text-secondary d-block">Resident</small>
+                            <span>{{ request_obj.resident.username }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-secondary d-block">Category</small>
+                            <span>{{ request_obj.category }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-secondary d-block">Description</small>
+                        <p class="mb-0">{{ request_obj.description }}</p>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-sm-4">
+                            <small class="text-secondary d-block">Created At</small>
+                            <span>{{ request_obj.created_at }}</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <small class="text-secondary d-block">Priority</small>
+                            <span>{{ request_obj.get_priority_display }}</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <small class="text-secondary d-block">Predicted Duration</small>
+                            <span>{{ request_obj.predicted_duration_minutes }} mins</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card card-glass shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h2 class="h6 mb-3 text-light">
+                        <i class="fa-solid fa-robot me-2 text-info"></i>
+                        ML Assignment
+                    </h2>
+
+                    {% if request_obj.assignment %}
+                        <div class="mb-2">
+                            <small class="text-secondary d-block">Assigned Staff</small>
+                            <span class="fw-semibold">
+                                {{ request_obj.assignment.staff.username }}
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-secondary d-block">ML Suitability Score</small>
+                            <span class="text-info fw-semibold">
+                                {{ request_obj.assignment.score|floatformat:3 }}
+                            </span>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <small class="text-secondary d-block">Assigned At</small>
+                                <span>{{ request_obj.assignment.assigned_at }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-secondary d-block">Pred. Start</small>
+                                <span>{{ request_obj.assignment.predicted_start_time }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-secondary d-block">Pred. End</small>
+                            <span>{{ request_obj.assignment.predicted_end_time }}</span>
+                        </div>
+                    {% else %}
+                        <p class="text-secondary mb-0">
+                            No staff assigned yet. Once the request is created,
+                            the ML scheduler will pick the best available staff
+                            based on skills, workload and priority.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

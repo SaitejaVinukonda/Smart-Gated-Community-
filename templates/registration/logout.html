@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+<div class="py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card card-glass shadow-lg border-0 mx-auto" style="max-width: 400px;">
+                <div class="card-body p-5">
+                    <i class="fa-solid fa-check-circle fa-4x text-success mb-4"></i>
+                    <h1 class="h3 mb-3 gradient-text">Logged Out Successfully</h1>
+                    <p class="text-secondary mb-4">
+                        You have been signed out of the Smart Gated Community system.
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-lg btn-info w-100 mb-2">
+                        <i class="fa-solid fa-house me-2"></i>Back to Home
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light w-100">
+                        <i class="fa-solid fa-sign-in-alt me-2"></i>Login Again
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
