@@ -27,9 +27,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("visitors/", include("visitors.urls")),
     path("maintainance/", include("maintainance.urls")),
+    path("visitor_verification/", include("visitor_verification.urls")),
+    path("visitor_verify/", include("visitor_verify.urls")),
     path("accounts/login/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),
     #path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("accounts/logout/", views.logout_view, name="logout"),
+    path('accounts/', include('accounts.urls')),
 ]
 
 if settings.DEBUG:

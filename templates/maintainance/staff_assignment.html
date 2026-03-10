@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Task Assigned: {{ title|default:"Maintenance Task" }}</title>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1d4ed8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1d4ed8 100%);
+            color: white;
+            padding: 45px 35px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .header h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-icon {
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        /* Content */
+        .content {
+            padding: 45px 35px;
+        }
+        
+        .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        
+        .greeting-name {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .intro-text {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        
+        /* Priority Badge */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 8px 0;
+        }
+        
+        .priority-1 { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .priority-2 { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .priority-3 { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        
+        /* Task Details Card */
+        .task-card {
+            background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+        }
+        
+        .task-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .task-card h3 {
+            color: #1e40af;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .detail-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        /* Action Button */
+        .action-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .dashboard-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 32px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 10px 30px rgba(16,185,129,0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .dashboard-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16,185,129,0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 30px 35px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-text {
+            color: #64748b;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .footer-signature {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .task-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .email-container { margin: 0; border-radius: 16px; }
+            .content, .header, .footer { padding-left: 20px; padding-right: 20px; }
+            .detail-grid { grid-template-columns: 1fr; }
+            .task-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h2>
+                <span class="header-icon">🛠</span>
+                New Maintenance Task Assigned
+            </h2>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">
+                Hello <span class="greeting-name">{{ staff_name|default:"Team Member" }}</span>,
+            </p>
+            
+            <p class="intro-text">
+                You've been assigned a new maintenance request. Please review the details below and take appropriate action.
+            </p>
+            
+            <!-- Task Card -->
+            <div class="task-card">
+                <h3>📋 Task Details</h3>
+                <div class="task-title">{{ title|default:"Maintenance Task" }}</div>
+                
+                <div class="priority-badge priority-{{ priority|default:3 }}">
+                    {% if priority == 1 %}🔴 High Priority
+                    {% elif priority == 2 %}🟡 Medium Priority  
+                    {% else %}🟢 Low Priority{% endif %}
+                    ({{ priority|default:"N/A" }})
+                </div>
+                
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">{{ category|default:"Uncategorized" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Resident</div>
+                        <div class="detail-value">
+                            {% if resident %}{{ resident }}{% else %}Unknown{% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Flat</div>
+                        <div class="detail-value">{{ flat|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ description|default:"No description provided" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Button -->
+            <div class="action-section">
+                <a href="http://127.0.0.1:8000/maintainance/dashboard/" class="dashboard-btn">
+                    👉 Open Dashboard - Accept/Reject Task
+                </a>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">Gated Community Maintenance System</p>
+            <p class="footer-signature">This is an automated notification. For support, contact administration.</p>
+        </div>
+    </div>
+</body>
+</html>

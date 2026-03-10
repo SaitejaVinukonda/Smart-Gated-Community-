@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Complete Task{% endblock %}
+
+{% block extra_head %}
+<style>
+    .card-glass { 
+        background: rgba(255, 255, 255, 0.12); 
+        backdrop-filter: blur(30px); 
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .btn-complete { 
+        background: linear-gradient(135deg, #10b981, #059669); 
+        border: none; 
+        padding: 1.25rem 3rem; 
+        font-size: 1.2rem; 
+        font-weight: 700; 
+        border-radius: 25px;
+        height: 70px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 class="h3 mb-3 gradient-text">
+                        <i class="fa-solid fa-check-circle me-2"></i>
+                        Mark Task Complete
+                    </h1>
+                    <p class="text-light mb-0" style="font-size: 1.2rem;">Task #{{ assignment.id }}</p>
+                </div>
+
+                <!-- Glass Card -->
+                <div class="card card-glass shadow-lg">
+                    <div class="card-body p-5 text-center">
+                        <!-- Success Animation -->
+                        <div class="mb-5">
+                            <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 40px rgba(16,185,129,0.4);">
+                                <i class="fa-solid fa-check" style="font-size: 3rem; color: white;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Task Summary -->
+                        <div class="mb-5 p-4" style="background: rgba(16,185,129,0.2); border-radius: 20px; backdrop-filter: blur(15px); border: 1px solid rgba(16,185,129,0.3);">
+                            <h3 class="text-white mb-3">{{ assignment.request.title }}</h3>
+                            <div class="row text-start">
+                                <div class="col-md-6">
+                                    <p class="text-light mb-1"><strong>Category:</strong> {{ assignment.request.category }}</p>
+                                    <p class="text-light mb-1"><strong>Priority:</strong> {{ assignment.request.priority }}/4</p>
+                                    <p class="text-light"><strong>Resident:</strong> {{ assignment.request.resident.get_full_name }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="text-light mb-1"><strong>Started:</strong> {{ assignment.started_at|date:"M d, Y g:i A" }}</p>
+                                    <p class="text-light mb-1"><strong>Duration:</strong> 
+                                        {% if assignment.completed_at %}
+                                            {{ assignment.completed_at|timeuntil:"started_at" }}
+                                        {% else %}
+                                            In Progress
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Button -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-complete text-white mb-4">
+                                <i class="fa-solid fa-flag-checkered me-2"></i>
+                                ✅ Mark As Completed
+                            </button>
+                        </form>
+
+                        <div class="mt-4 pt-3" style="border-top: 1px solid rgba(255,255,255,0.2);">
+                            <p class="text-light mb-0" style="opacity: 0.8;">
+                                <i class="fa-solid fa-star me-1"></i>
+                                Resident will be able to rate your service after completion
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

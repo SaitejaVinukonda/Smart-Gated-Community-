@@ -1,0 +1,61 @@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Live Camera -->
+            <div class="space-y-4 camera-container">
+                <h3 class="text-2xl font-semibold">📸 Live Verification</h3>
+                <video id="video" autoplay muted playsinline 
+                       class="w-full rounded-2xl shadow-2xl border-4 border-blue-500/30"></video>
+                <canvas id="canvas" class="hidden" width="640" height="480"></canvas>
+                <img id="livePreview" class="preview" alt="Captured face preview" style="display:none;" />
+                <div id="cameraStatus" class="camera-status" style="display:none;">📷 Camera ready</div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="space-y-6">
+                <div id="layerResults" class="bg-gray-900/50 p-8 rounded-3xl border-2 border-gray-700 hidden">
+                    <h3 class="text-2xl font-bold mb-6">Verification Layers</h3>
+                    <div id="layerScores" class="space-y-3"></div>
+                    <div id="confidenceBar" class="w-full h-6 bg-gray-700 rounded-full mt-6 overflow-hidden">
+                        <div id="confidenceFill" class="h-full bg-gradient-to-r from-red-500 to-green-500 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+// Camera setup
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const livePreviewImg = document.getElementById('livePreview');
+    const cameraStatusDiv = document.getElementById('cameraStatus');
+    navigator.mediaDevices.getUserMedia({video: {width: 640, height: 480, facingMode: 'user'}})
+        .then(s => {
+            stream = s;
+            video.srcObject = s;
+            cameraStatusDiv.style.display = 'block';
+        })
+        .catch(err => {
+            console.error('Camera error:', err);
+            cameraStatusDiv.textContent = '🚫 Camera unavailable';
+            cameraStatusDiv.style.color = '#dc3545';
+            cameraStatusDiv.style.display = 'block';
+        });
+
+    document.getElementById('verifyForm').onsubmit = async function(e) {
+        e.preventDefault();
+        
+        // Capture photo
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const photoData = canvas.toDataURL('image/jpeg', 0.8);
+        if (livePreviewImg) {
+            livePreviewImg.src = photoData;
+            livePreviewImg.style.display = 'block';
+        }
+        
+        // Mock ID photo (same for demo - production uses separate ID camera)
+        const idPhotoData = photoData;
+        
+        const formData = new FormData();
+        formData.append('live_photo', photoData);
+        formData.append('id_photo', idPhotoData);
+        Array.from(this.elements).forEach(el => {
+            if (el.name && el.value) formData.append(el.name, el.value);
+        });

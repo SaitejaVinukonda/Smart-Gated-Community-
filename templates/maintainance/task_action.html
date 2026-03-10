@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Task Action{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.12);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --glass-blur: blur(30px);
+        --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-success: linear-gradient(135deg, #10b981, #059669);
+        --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-action {
+        padding: 1.25rem 3rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 20px;
+        height: 65px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 10px 30px rgb(227, 15, 224);
+    }
+    
+    .btn-accept {
+        background: var(--gradient-success);
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-reject {
+        background: var(--gradient-danger);
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+    }
+    
+    .priority-badge {
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .summary-panel {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-5 min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        <i class="fa-solid fa-screwdriver-wrench me-3"></i>
+                        Task #{{ assignment.id }}
+                    </h1>
+                    <p class="text-light lead mb-0">What would you like to do?</p>
+                </div>
+
+                <!-- Glass Card -->
+                <div class="glass-card p-5">
+                    <div class="text-center mb-5">
+                        <!-- Request Summary -->
+                        <div class="summary-panel p-4 mb-5">
+                            <h3 class="text-white mb-4 fw-bold">{{ assignment.request.title }}</h3>
+                            <div class="row g-4 text-start">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa-solid fa-tag me-3 text-info fs-5"></i>
+                                        <div>
+                                            <div class="text-light fw-semibold small">Category</div>
+                                            <div class="text-white fw-bold fs-5">{{ assignment.request.category }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-exclamation-triangle me-3 text-warning fs-5"></i>
+                                        <div>
+                                            <div class="text-light fw-semibold small">Priority</div>
+                                            <span class="priority-badge" style="background: 
+                                                {% if assignment.request.priority == 1 %}var(--gradient-success)
+                                                {% elif assignment.request.priority == 2 %}linear-gradient(135deg, #f59e0b, #d97706)
+                                                {% elif assignment.request.priority == 3 %}var(--gradient-danger)
+                                                {% else %}linear-gradient(135deg, #8b5cf6, #7c3aed){% endif %};
+                                                color: white;">
+                                                {{ assignment.request.priority }}/4
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa-solid fa-user me-3 text-success fs-5"></i>
+                                        <div>
+                                            <div class="text-light fw-semibold small">Resident</div>
+                                            <div class="text-white fw-bold">{{ assignment.request.resident.get_full_name }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-clock me-3 text-primary fs-5"></i>
+                                        <div>
+                                            <div class="text-light fw-semibold small">Assigned</div>
+                                            <div class="text-white">{{ assignment.assigned_at|date:"M d, Y g:i A" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-md-6">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="accept">
+                                <button type="submit" class="btn btn-action btn-accept w-100 text-white">
+                                    <i class="fa-solid fa-check-double me-2"></i>
+                                    Accept Task
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-action btn-reject w-100 text-white">
+                                    <i class="fa-solid fa-times me-2"></i>
+                                    Reject Task
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="mt-5 pt-4 border-top" style="border-color: rgba(255,255,255,0.2) !important;">
+                        <p class="text-light mb-0" style="opacity: 0.8; font-size: 0.95rem;">
+                            <i class="fa-solid fa-info-circle me-2 text-info"></i>
+                            <strong>Rejecting</strong> will automatically reassign to another available staff member
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

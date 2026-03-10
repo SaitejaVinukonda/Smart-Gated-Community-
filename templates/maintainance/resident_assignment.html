@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Request Assigned</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .header-icon {
+            font-size: 32px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .greeting-name {
+            color: #4f46e5;
+        }
+        
+        .status-message {
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            color: #166534;
+        }
+        
+        /* Task Details Card */
+        .task-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .task-card h3 {
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+        }
+        
+        /* Staff Contact Card */
+        .staff-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .staff-card h3 {
+            color: #d97706;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .staff-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #b45309;
+            margin-bottom: 4px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .contact-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #92400e;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f8fafc;
+            padding: 24px 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-text {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-container {
+                margin: 0;
+                border-radius: 12px;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .detail-value {
+                text-align: left;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .task-card, .staff-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h2>
+                <span class="header-icon">✅</span>
+                Maintenance Request Assigned
+            </h2>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">
+                Hello <strong class="greeting-name">{{ resident_name|default:"Resident" }}</strong>,
+            </p>
+            
+            <div class="status-message">
+                <strong>Your maintenance request has been successfully assigned to our skilled staff!</strong>
+            </div>
+            
+            <!-- Task Details -->
+            <div class="task-card">
+                <h3>📋 Request Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Issue: {{ title|default:"No title provided" }}</span>
+        
+                </div>
+            </div>
+            
+            <!-- Staff Contact -->
+            <div class="staff-card">
+                <h3>👨‍🔧 Assigned Staff</h3>
+                <p class="staff-name">{{ staff_name|default:"Staff Member" }}</p>
+                <p style="color: #92400e; font-size: 14px; margin-bottom: 16px;">
+                    <strong>Specialty:</strong> {{ skill|default:"General Maintenance" }}
+                </p>
+                
+                <div class="contact-item">
+                    <span class="contact-icon">📱</span>
+                    <strong>Phone:</strong> {{ phone|default:"Not provided" }}
+                </div>
+                
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <strong>Email:</strong> {{ email|default:"Not provided" }}
+                </div>
+            </div>
+            
+            <p style="color: #6b7280; font-style: italic; margin-top: 24px;">
+                The assigned staff member will reach out to you shortly to schedule the service.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                — Gated Community Maintenance System<br>
+                <small style="color: #9ca3af;">This is an automated message. Please do not reply.</small>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

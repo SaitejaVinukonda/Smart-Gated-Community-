@@ -1,42 +1,381 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% block title %}Login - Smart Gated Community{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Login Page Specific Styles */
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Gate Animation Background */
+    .gate-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .gate-left, .gate-right {
+        position: absolute;
+        height: 100vh;
+        width: 50%;
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(31, 41, 55, 0.95));
+        backdrop-filter: blur(20px);
+        border-right: 2px solid rgba(255, 255, 255, 0.1);
+        transform-origin: right center;
+        animation: gateOpen 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .gate-right {
+        right: 0;
+        border-left: 2px solid rgba(255, 255, 255, 0.1);
+        transform-origin: left center;
+        animation-delay: 0.5s;
+    }
+
+    @keyframes gateOpen {
+        0% {
+            transform: perspective(800px) rotateY(0deg);
+        }
+        70% {
+            transform: perspective(800px) rotateY(-95deg);
+        }
+        100% {
+            transform: perspective(800px) rotateY(-110deg);
+        }
+    }
+
+    /* Role-based Icons */
+    .role-icon {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 4rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), #facc15);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: iconFloat 3s ease-in-out infinite;
+        z-index: 4;
+    }
+
+    @keyframes iconFloat {
+        0%, 100% { transform: translateX(-50%) translateY(0px); }
+        50% { transform: translateX(-50%) translateY(-15px); }
+    }
+
+    /* Enhanced Glass Card */
+    .login-card {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(35px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 32px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+        position: relative;
+        z-index: 3;
+        overflow: hidden;
+        animation: cardSlideIn 1s ease-out 1.5s both;
+        max-width: 420px;
+        width: 100%;
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.8s ease;
+    }
+
+    .login-card:hover::before {
+        left: 100%;
+    }
+
+    @keyframes cardSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Form Elements */
+    .form-floating-custom {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-floating-custom input {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        color: #fff;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 56px;
+    }
+
+    .form-floating-custom input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-floating-custom input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(102, 126, 234, 0.6);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.2);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    .form-floating-custom label {
+        position: absolute;
+        top: 50%;
+        left: 1.25rem;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    /* Enhanced Button */
+    .login-btn {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        border-radius: 20px;
+        padding: 1.1rem 2rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: white;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .login-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.6);
+    }
+
+    /* Role Selection */
+    .role-tabs {
+        display: flex;
+        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 0.25rem;
+        backdrop-filter: blur(15px);
+    }
+
+    .role-tab {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .role-tab.active {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* Particles */
+    .login-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 2;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: particleFloat 15s infinite linear;
+    }
+
+    .particle:nth-child(1) { left: 10%; width: 8px; height: 8px; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 20%; width: 5px; height: 5px; animation-delay: 3s; }
+    .particle:nth-child(3) { left: 80%; width: 6px; height: 6px; animation-delay: 6s; }
+    .particle:nth-child(4) { left: 90%; width: 4px; height: 4px; animation-delay: 9s; }
+
+    @keyframes particleFloat {
+        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .login-card {
+            margin: 1rem;
+            border-radius: 24px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-glass shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <i class="fa-solid fa-lock fa-3x text-info mb-3"></i>
-                        <h1 class="h4 mb-0 gradient-text">Sign In</h1>
+<div class="login-container">
+    <!-- Animated Gate Background -->
+    <div class="gate-bg">
+        <div class="gate-left"></div>
+        <div class="gate-right"></div>
+    </div>
+
+    <!-- Floating Particles -->
+    <div class="login-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Role Icon (Dynamic based on context) -->
+    <div class="role-icon">
+        {% if request.user.is_authenticated and request.user.role == 'STAFF' %}
+            <i class="fa-solid fa-user-shield"></i>
+        {% elif request.user.is_authenticated and request.user.role == 'ADMIN' %}
+            <i class="fa-solid fa-user-crown"></i>
+        {% else %}
+            <i class="fa-solid fa-building-shield"></i>
+        {% endif %}
+    </div>
+
+    <!-- Main Login Card -->
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card login-card">
+            <div class="card-body p-5 position-relative">
+                <!-- Role Selection Tabs -->
+                <div class="role-tabs mb-4">
+                    <button class="role-tab active" onclick="setRole('resident')">
+                        <i class="fa-solid fa-home me-1"></i>Resident
+                    </button>
+                    <button class="role-tab" onclick="setRole('staff')">
+                        <i class="fa-solid fa-user-gear me-1"></i>Staff
+                    </button>
+                </div>
+
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-lock fa-4x mb-4" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent;"></i>
+                    <h1 class="h3 mb-1 fw-bold" style="background: linear-gradient(135deg, #fff, #facc15); -webkit-background-clip: text; background-clip: text;">Welcome Back</h1>
+                    <p class="text-white-50 mb-0">Enter your credentials to access the community portal</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="form-floating-custom">
+                        <input type="text" name="username" class="form-control" id="username" required placeholder=" ">
+                        <label for="username">
+                            <i class="fa-solid fa-user me-2"></i>Username
+                        </label>
                     </div>
 
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label text-light">Username</label>
-                            <input type="text" name="username" class="form-control" required
-                                   placeholder="Enter username">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-light">Password</label>
-                            <input type="password" name="password" class="form-control" required
-                                   placeholder="Enter password">
-                        </div>
-                        <button type="submit" class="btn btn-info w-100">
-                            <i class="fa-solid fa-sign-in-alt me-2"></i>Login
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-3">
-                        <p class="text-secondary small mb-0">
-                            No account? Use admin panel to create one.
-                        </p>
+                    <div class="form-floating-custom">
+                        <input type="password" name="password" class="form-control" id="password" required placeholder=" ">
+                        <label for="password">
+                            <i class="fa-solid fa-lock me-2"></i>Password
+                        </label>
                     </div>
+
+                    <button type="submit" class="login-btn mt-4">
+                        <i class="fa-solid fa-sign-in-alt me-2"></i>
+                        Access Portal
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-3">
+                    <p class="text-white-50 small mb-0">
+                        <i class="fa-solid fa-info-circle me-1"></i>
+                        Use admin panel to create accounts or contact support
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Role tab functionality
+    function setRole(role) {
+        document.querySelectorAll('.role-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Update role icon
+        const icons = {
+            'resident': 'fa-solid fa-home',
+            'staff': 'fa-solid fa-user-shield'
+        };
+        document.querySelector('.role-icon i').className = icons[role] || 'fa-solid fa-building-shield';
+    }
+
+    // Form animations
+    document.querySelectorAll('.form-floating-custom input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // Add floating animation to role icon
+    const roleIcon = document.querySelector('.role-icon');
+    setInterval(() => {
+        roleIcon.style.animationPlayState = roleIcon.style.animationPlayState === 'paused' ? 'running' : 'paused';
+    }, 3000);
+</script>
 {% endblock %}

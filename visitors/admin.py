@@ -1,71 +1,29 @@
 from django.contrib import admin
-from .models import Visitor, VisitRequest, AccessCode, GateEvent
+from .models import Resident, VisitRequest
 
-@admin.register(Visitor)
-class VisitorAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'phone', 'email', 'frequent_visitor']
-    list_filter = ['frequent_visitor']
-    search_fields = ['full_name', 'phone', 'email']
-    readonly_fields = []
+@admin.register(Resident)
+class ResidentAdmin(admin.ModelAdmin):
+    list_display = ['flat_number', 'name', 'phone']
+    search_fields = ['flat_number', 'name']
+    list_filter = ['created_at']
 
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_visitor_name', 'get_resident_name', 'get_status', 'risk_score', 'get_request_time']
-    list_filter = ['auto_decision']
-    search_fields = ['visitor__full_name', 'purpose', 'target_flat']
-    readonly_fields = ['get_request_time']
+    list_display = ['visitor_name', 'resident_flat', 'overall_confidence', 'status', 'created_at']
+    list_filter = ['status', 'overall_confidence', 'created_at']
+    search_fields = ['visitor_name', 'resident_flat', 'phone']
+    readonly_fields = ['id', 'created_at']
     
-    # Custom methods for foreign key
-    def get_visitor_name(self, obj):
-        v = getattr(obj, 'visitor', None)
-        if v:
-            return getattr(v, 'full_name', str(v))
-        # fallback to fields on VisitRequest if present, or show placeholder
-        return getattr(obj, 'visitor_name', getattr(obj, 'visitor_full_name', 'N/A'))
-    get_visitor_name.short_description = 'Visitor'
-    
-    def get_resident_name(self, obj):
-        r = getattr(obj, 'resident', None)
-        if r:
-            return getattr(r, 'username', str(r))
-        return getattr(obj, 'resident_name', 'N/A')
-    get_resident_name.short_description = 'Resident'
-    
-    def get_status(self, obj):
-        if hasattr(obj, 'status'):
-            return getattr(obj, 'status')
-        if hasattr(obj, 'get_status_display'):
-            try:
-                return obj.get_status_display()
-            except Exception:
-                pass
-        if hasattr(obj, 'auto_decision'):
-            return 'Auto-approved' if obj.auto_decision else 'Auto-rejected'
-        return 'N/A'
-    get_status.short_description = 'Status'
-    
-    def get_request_time(self, obj):
-        rt = getattr(obj, 'request_time', None)
-        if not rt:
-            return 'N/A'
-        return rt.strftime('%Y-%m-%d %H:%M')
-    get_request_time.short_description = 'Created'
-
-@admin.register(AccessCode)
-class AccessCodeAdmin(admin.ModelAdmin):
-    list_display = ['code', 'get_request_id', 'code_type', 'valid_from', 'valid_to', 'used']
-    list_filter = ['code_type', 'used']
-    
-    def get_request_id(self, obj):
-        return obj.request.id
-    get_request_id.short_description = 'Request'
-
-@admin.register(GateEvent)
-class GateEventAdmin(admin.ModelAdmin):
-    list_display = ['get_code', 'direction', 'timestamp', 'verified_by_ml']
-    list_filter = ['direction', 'verified_by_ml']
-    date_hierarchy = 'timestamp'
-    
-    def get_code(self, obj):
-        return obj.access_code.code
-    get_code.short_description = 'Access Code'
+    fieldsets = (
+        ('Visitor Info', {
+            'fields': ('visitor_name', 'visitor_phone', 'visitor_email', 'resident_flat', 'purpose')
+        }),
+        ('AI Scores', {
+            'fields': ('face_match_score', 'id_ocr_confidence', 'tampering_score', 
+                      'purpose_match_score', 'resident_validation', 'anomaly_score', 'overall_confidence'),
+        }),
+        ('Status & Technical', {
+            'fields': ('status', 'qr_code_data', 'live_photo', 'id_photo', 'id', 'created_at'),
+            'classes': ('collapse',)
+        })
+    )

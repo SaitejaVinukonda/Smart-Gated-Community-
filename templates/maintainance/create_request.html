@@ -1,60 +1,246 @@
 {% extends "base.html" %}
 {% block title %}New Maintenance Request{% endblock %}
 
+{% block extra_head %}
+<style>
+    /* Glassmorphism Form Styles */
+    .gradient-text {
+        background: linear-gradient(135deg, #fff 0%, #facc15 50%, #6366f1 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        font-weight: 800;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-glass {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(30px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        color: #fff;
+    }
+
+    .card-glass:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .form-label {
+        color: #ffffff !important;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 16px;
+        color: #ffffff !important;
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(99, 102, 241, 0.6) !important;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25), 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: #063c64 !important;
+        transform: translateY(-2px);
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .form-control option {
+        background: rgba(15, 23, 42, 0.95);
+        color: #ffffff;
+    }
+
+    /* Priority Select Colors */
+    .form-select option[value="1"] { color: #10b981; } /* Low - Green */
+    .form-select option[value="2"] { color: #f59e0b; } /* Medium - Yellow */
+    .form-select option[value="3"] { color: #f97316; } /* High - Orange */
+    .form-select option[value="4"] { color: #ef4444; } /* Critical - Red */
+
+    /* Custom Select Styling */
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='rgba%28255,255,255,0.7%29' viewBox='0 0 16 16'%3e%3cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
+    }
+
+    /* Buttons */
+    .btn-outline-light {
+        color: rgba(255, 255, 255, 0.9) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.7) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: #fff !important;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        border: none !important;
+        border-radius: 16px;
+        padding: 0.875rem 2.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-success:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    }
+
+    /* Form Row Enhancements */
+    .row.g-3 > div {
+        transition: transform 0.3s ease;
+    }
+
+    .row.g-3 > div:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-glass {
+            margin: 0 1rem;
+            border-radius: 20px;
+        }
+        
+        .btn-success, .btn-outline-light {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .d-flex.justify-content-end {
+            flex-direction: column;
+        }
+    }
+
+    /* Animation for form load */
+    .card-glass {
+        animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 gradient-text">Create Maintenance Request</h1>
-            <p class="text-secondary mb-0">
-                Log an issue and let the ML scheduler auto‑assign the best staff.
+            <p class="text-light mb-0" style="opacity: 0.9; font-size: 1.1rem;">
+                Log an issue and let the ML scheduler auto‑assign the best staff member.
             </p>
         </div>
+        <a href="/" class="btn btn-outline-light">
+            <i class="fa-solid fa-home me-2"></i>Dashboard
+        </a>
     </div>
 
-    <div class="card card-glass shadow-sm border-0">
-        <div class="card-body p-4">
+    <!-- Glassmorphism Form Card -->
+    <div class="card card-glass shadow-lg">
+        <div class="card-body p-4 p-md-5">
             <form method="post" novalidate>
                 {% csrf_token %}
-                <div class="row g-3">
+                
+                <!-- Form Fields -->
+                <div class="row g-4">
+                    <!-- Title -->
                     <div class="col-md-6">
-                        <label class="form-label text-light">Title<span class="text-danger">*</span></label>
-                        <input type="text" name="title" class="form-control"
-                               placeholder="e.g. Kitchen tap leaking" required>
+                        <label class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               name="title" 
+                               class="form-control" 
+                               placeholder="e.g. Kitchen tap leaking, Broken gate lock"
+                               value="{{ request.POST.title|default:'' }}"
+                               required>
                     </div>
+
+                    <!-- Category -->
                     <div class="col-md-6">
-                        <label class="form-label text-light">Category (Skill)</label>
+                        <label class="form-label">Category (Skill Required)</label>
                         <select name="category" class="form-select">
-                            <option value="ELECTRICAL">Electrical</option>
-                            <option value="PLUMBING">Plumbing</option>
-                            <option value="CLEANING">Cleaning</option>
-                            <option value="SECURITY">Security Systems</option>
-                            <option value="GENERAL" selected>General Maintenance</option>
+                            <option value="ELECTRICAL" {% if request.POST.category == 'ELECTRICAL' %}selected{% endif %}>⚡ Electrical</option>
+                            <option value="PLUMBING" {% if request.POST.category == 'PLUMBING' %}selected{% endif %}>🚿 Plumbing</option>
+                            <option value="CLEANING" {% if request.POST.category == 'CLEANING' %}selected{% endif %}>🧹 Cleaning</option>
+                            <option value="SECURITY" {% if request.POST.category == 'SECURITY' %}selected{% endif %}>🔒 Security Systems</option>
+                            <option value="GENERAL" {% if request.POST.category == 'GENERAL' %}selected{% endif %}>🔧 General Maintenance</option>
                         </select>
                     </div>
+
+                    <!-- Priority -->
                     <div class="col-md-6">
-                        <label class="form-label text-light">Priority</label>
+                        <label class="form-label">Priority Level</label>
                         <select name="priority" class="form-select">
-                            <option value="1">Low</option>
-                            <option value="2" selected>Medium</option>
-                            <option value="3">High</option>
-                            <option value="4">Critical</option>
+                            <option value="1" {% if request.POST.priority == '1' %}selected{% endif %}>🟢 Low</option>
+                            <option value="2" {% if request.POST.priority == '2' %}selected{% endif %} selected>🟡 Medium</option>
+                            <option value="3" {% if request.POST.priority == '3' %}selected{% endif %}>🟠 High</option>
+                            <option value="4" {% if request.POST.priority == '4' %}selected{% endif %}>🔴 Critical</option>
                         </select>
                     </div>
+
+                    <!-- Description -->
                     <div class="col-12">
-                        <label class="form-label text-light">Description<span class="text-danger">*</span></label>
-                        <textarea name="description" rows="4" class="form-control"
-                                  placeholder="Describe the issue, location, and any safety concerns."
-                                  required></textarea>
+                        <label class="form-label">Detailed Description <span class="text-danger">*</span></label>
+                        <textarea name="description" 
+                                  rows="5" 
+                                  class="form-control" 
+                                  placeholder="Describe the issue in detail including:
+- Exact location (e.g., Block A, Flat 204)
+- When the problem started
+- Any safety concerns
+- Photos if available (upload separately)"
+                                  required>{{ request.POST.description|default:'' }}</textarea>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="/" class="btn btn-outline-light me-2">
-                        <i class="fa-solid fa-arrow-left me-1"></i>Cancel
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top border-light border-opacity-20">
+                    <a href="/" class="btn btn-outline-light">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
                     </a>
                     <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-screwdriver-wrench me-1"></i>Submit Request
+                        <i class="fa-solid fa-screwdriver-wrench me-2"></i>Submit Request
                     </button>
                 </div>
             </form>

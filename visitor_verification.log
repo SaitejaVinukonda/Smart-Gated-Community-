@@ -1,0 +1,643 @@
+Verification error: 'AadhaarOCR' object has no attribute 'extract_data'
+Traceback (most recent call last):
+  File "C:\Users\saite\OneDrive\Documents\Desktop\gated\community\visitor_verification\views.py", line 145, in post
+    ocr_data = aadhaar_ocr.extract_data(aadhaar_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AadhaarOCR' object has no attribute 'extract_data'. Did you mean: 'extract_aadhaar'?
+OCR Error: 'AadhaarOCR' object has no attribute 'extract_data'
+OCR Error: 'AadhaarOCR' object has no attribute 'extract_data'
+OCR result: {'success': False, 'message': 'No Aadhaar found'}
+OCR text (config: --oem 3 --...): 
+OCR text (config: --oem 3 --...): 
+OCR text (config: --oem 3 --...): 
+OCR text (config: --oem 3 --...): 2
+
+1
+
+8
+
+1
+
+2
+
+7
+
+No Aadhaar pattern found in OCR text:     2
+
+1
+
+8
+
+1
+
+2
+
+7
+
+OCR result: {'success': False, 'message': 'No Aadhaar found in image'}
+Using manually entered Aadhaar: 807147276803
+Face verification: {'verified': False, 'confidence': 60.0, 'aadhaar_face_found': False, 'live_face_found': False, 'message': 'No clear faces detected', 'method': 'OpenCV'}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+OCR text (config: --oem 3 --...): 
+OCR text (config: --oem 3 --...): 2
+0 22
+8
+1
+
+OCR text (config: --oem 3 --...): 
+OCR text (config: --oem 3 --...): 3
+
+No Aadhaar pattern found in OCR text:   2
+0 22
+8
+1
+  3
+
+OCR result: {'success': False, 'message': 'No Aadhaar found in image'}
+Using manually entered Aadhaar: 807147276803
+Face verification: {'verified': False, 'confidence': 60.0, 'aadhaar_face_found': True, 'live_face_found': False, 'message': 'No clear faces detected', 'method': 'OpenCV'}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Image loaded, shape: (1288, 989, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ES ENS ||_ Sh SS ZN |
+i= TT :
+ILS) ehasicemaratnstebiensy sess I Siete oer enon ape
+q ne,
+
+ee ||| |e
+OCR (v1_aggressive, --oem 3 --psm 1...): ce
+
+ae
+
+‘i
+
+ig
+
+Se
+
+ee
+
+es
+
+6
+
+=
+
+ie
+
+ees
+
+Va
+
+=
+
+TINFORBATION,T
+
+ascinmats
+
+fel
+
+‘dees
+
+res
+
+aes
+
+S
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): 
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): roe = ~aroas INFORMATION
+Goverment of india woe Sas arp args Baunetie gage ipa wESSe
+Unique Identifi
+Found Aadhaar with strict pattern: 924847835248
+OCR result: {'success': True, 'aadhaar': '924847835248', 'raw_text': 'roe = ~aroas INFORMATION\nGoverment of india woe Sas arp args Baunetie gage ipa wESSe\nUnique Identification Authority of india BES asthe te wr kev asta woe a Be\nOR RPAH mvolment Now! 0623/00743/02093 ee crepe\nMeese + scagma score\nbe eased measg / Your Aadhaar No. sm Note your monte nomen’ or ema pated a\n9248 4783 5248 © Seton mcuentntnctinmat ne emacs ate\na esarS, =r Sena (= Corres ceening svt ore ootgaten to soak concent\ni Sete jae mae\ni HEE SNR rsemet. |2]e eae\n9248 4783 5248 | SRS SEF Ses Soa\nSee a SEES S|; ae oe |\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+OpenCV Face match: 0.0%
+Face verification: {'verified': False, 'confidence': 0.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Faces do not match', 'method': 'OpenCV', 'is_match': False, 'error': "module 'sklearn.metrics' has no attribute 'structural_similarity'"}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Image loaded, shape: (1288, 989, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ES ENS ||_ Sh SS ZN |
+i= TT :
+ILS) ehasicemaratnstebiensy sess I Siete oer enon ape
+q ne,
+
+ee ||| |e
+OCR (v1_aggressive, --oem 3 --psm 1...): ce
+
+ae
+
+‘i
+
+ig
+
+Se
+
+ee
+
+es
+
+6
+
+=
+
+ie
+
+ees
+
+Va
+
+=
+
+TINFORBATION,T
+
+ascinmats
+
+fel
+
+‘dees
+
+res
+
+aes
+
+S
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): 
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): roe = ~aroas INFORMATION
+Goverment of india woe Sas arp args Baunetie gage ipa wESSe
+Unique Identifi
+Found Aadhaar with strict pattern: 924847835248
+OCR result: {'success': True, 'aadhaar': '924847835248', 'raw_text': 'roe = ~aroas INFORMATION\nGoverment of india woe Sas arp args Baunetie gage ipa wESSe\nUnique Identification Authority of india BES asthe te wr kev asta woe a Be\nOR RPAH mvolment Now! 0623/00743/02093 ee crepe\nMeese + scagma score\nbe eased measg / Your Aadhaar No. sm Note your monte nomen’ or ema pated a\n9248 4783 5248 © Seton mcuentntnctinmat ne emacs ate\na esarS, =r Sena (= Corres ceening svt ore ootgaten to soak concent\ni Sete jae mae\ni HEE SNR rsemet. |2]e eae\n9248 4783 5248 | SRS SEF Ses Soa\nSee a SEES S|; ae oe |\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+Extracted Aadhaar: 924847835248, Manual Aadhaar: 924847835248
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '924847835248', 'error': 'Invalid Verhoeff checksum'}
+OpenCV Face match: 0.0%
+Face verification: {'verified': False, 'confidence': 0.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Faces do not match', 'method': 'OpenCV', 'is_match': False, 'error': "module 'sklearn.metrics' has no attribute 'structural_similarity'"}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Image loaded, shape: (674, 551, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ae Sia att iy bee ——————e Se a
+ee _ CANS, |) 2 SSS aaa
+SS SS eS ST HSE || 3s ceeererstinres Vip SAC 
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'ae Sia att iy bee ——————e Se a\nee _ CANS, |) 2 SSS aaa\nSS SS eS ST HSE || 3s ceeererstinres Vip SAC AAR sce)\nGaSe | Sam INFORMATION. —\nSS éacnmanatinia = 4 ee)\n|_ witteienen Amen Wl) || Sea see os\nAG OeRISH Brmeioer Nos z7anmisiaisoer7ys |) | Sek ee eneaeee .\nae ES i fe 5) Ries oct mec o-aeaag odd eas Co eRSE Erde\nSKesBarremsiaes) i Pe ne A a Te ee\nCa meres i] | Seeker ie eesoareneee\nSP BRERA SES || | Sun Sotventywamtgenmcasonentencn Spotty ont oas\nOSOSSS 2 8071 2727 GRO | | Beate met oe ne occ\noa SNS EIN ROOT SEO i Fr aacuulyanen gat rg nbannertuenetion tac rIaes\nSP cn CES SEES EAS GSES Vinee A |$] _, |S Eaacenene Asgnbirarsctnato aber comme Sh .\n¢ Eee aaa |? ae ee\n_ _— 8071-4727 6803" oS x ns Se See Bee SO\n= 8071 4727 6803 ___— 6 SSS ee\n', 'confidence': 0.95, 'method': 'v1_aggressive'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+OpenCV Face match: 0.0%
+Face verification: {'verified': False, 'confidence': 0.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Faces do not match', 'method': 'OpenCV', 'is_match': False, 'error': "module 'sklearn.metrics' has no attribute 'structural_similarity'"}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Image loaded, shape: (674, 551, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ae Sia att iy bee ——————e Se a
+ee _ CANS, |) 2 SSS aaa
+SS SS eS ST HSE || 3s ceeererstinres Vip SAC 
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'ae Sia att iy bee ——————e Se a\nee _ CANS, |) 2 SSS aaa\nSS SS eS ST HSE || 3s ceeererstinres Vip SAC AAR sce)\nGaSe | Sam INFORMATION. —\nSS éacnmanatinia = 4 ee)\n|_ witteienen Amen Wl) || Sea see os\nAG OeRISH Brmeioer Nos z7anmisiaisoer7ys |) | Sek ee eneaeee .\nae ES i fe 5) Ries oct mec o-aeaag odd eas Co eRSE Erde\nSKesBarremsiaes) i Pe ne A a Te ee\nCa meres i] | Seeker ie eesoareneee\nSP BRERA SES || | Sun Sotventywamtgenmcasonentencn Spotty ont oas\nOSOSSS 2 8071 2727 GRO | | Beate met oe ne occ\noa SNS EIN ROOT SEO i Fr aacuulyanen gat rg nbannertuenetion tac rIaes\nSP cn CES SEES EAS GSES Vinee A |$] _, |S Eaacenene Asgnbirarsctnato aber comme Sh .\n¢ Eee aaa |? ae ee\n_ _— 8071-4727 6803" oS x ns Se See Bee SO\n= 8071 4727 6803 ___— 6 SSS ee\n', 'confidence': 0.95, 'method': 'v1_aggressive'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face comparison error: module 'sklearn.metrics' has no attribute 'structural_similarity'
+Standard face match: 0.0%
+Face verification: {'verified': False, 'confidence': 0.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Faces do not match - review recommended', 'method': 'OpenCV Multi-Algorithm', 'lenient_mode': False, 'is_match': False, 'error': "module 'sklearn.metrics' has no attribute 'structural_similarity'"}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Image loaded, shape: (674, 551, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ae Sia att iy bee ——————e Se a
+ee _ CANS, |) 2 SSS aaa
+SS SS eS ST HSE || 3s ceeererstinres Vip SAC 
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'ae Sia att iy bee ——————e Se a\nee _ CANS, |) 2 SSS aaa\nSS SS eS ST HSE || 3s ceeererstinres Vip SAC AAR sce)\nGaSe | Sam INFORMATION. —\nSS éacnmanatinia = 4 ee)\n|_ witteienen Amen Wl) || Sea see os\nAG OeRISH Brmeioer Nos z7anmisiaisoer7ys |) | Sek ee eneaeee .\nae ES i fe 5) Ries oct mec o-aeaag odd eas Co eRSE Erde\nSKesBarremsiaes) i Pe ne A a Te ee\nCa meres i] | Seeker ie eesoareneee\nSP BRERA SES || | Sun Sotventywamtgenmcasonentencn Spotty ont oas\nOSOSSS 2 8071 2727 GRO | | Beate met oe ne occ\noa SNS EIN ROOT SEO i Fr aacuulyanen gat rg nbannertuenetion tac rIaes\nSP cn CES SEES EAS GSES Vinee A |$] _, |S Eaacenene Asgnbirarsctnato aber comme Sh .\n¢ Eee aaa |? ae ee\n_ _— 8071-4727 6803" oS x ns Se See Bee SO\n= 8071 4727 6803 ___— 6 SSS ee\n', 'confidence': 0.95, 'method': 'v1_aggressive'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:0.47, Edges:0.50, Combined:0.48, Match:True
+Final face result: verified=True, confidence=75.0%
+Face verification: {'verified': True, 'confidence': 75.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verified', 'method': 'OpenCV LENIENT', 'lenient_mode': False, 'is_match': True, 'ssim': 0.5, 'histogram': 0.4740582335157377, 'edges': 0.5, 'orb_score': 0.4}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot A-001 to visitor chandra Vinukonda
+Emails sent for visit f37415b4-3008-4809-88f2-01eefe8db5b2
+Image loaded, shape: (1580, 665, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): Bf eae
+ill Sa ee el eel at ee
+2 ee ee
+UA See a einen See A
+a Vo ee ee
+POY ise et Goede eosin, Saree 
+OCR (v1_aggressive, --oem 3 --psm 1...): peers,
+
+wee
+
+eee
+
+meee
+
+Seg
+
+Bis
+
+Se
+
+jee
+
+ie
+
+ne
+
+SS
+
+ise
+
+Au
+
+is
+
+os
+
+Ls es
+
+a
+
+wy
+
+eek
+
+le
+
+Ss
+
+f
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): 
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): =a. Sivwar = :
+SsSovormmeasnt o& incisa %
+a LD PER STS SSS HTS :
+( WHiQue aGemtlificzaticon ANuttmor
+OCR (v2_gentle, --oem 3 --psm 1...): — IN
+
+ea
+
+Srrvarez
+
+oS Boos
+
+SsSovormmeasnt o&
+
+nois
+
+=
+
+—
+
+> oz
+
+SF SGee DSEA aS
+
+wnrigque
+
+ireres
+
+OCR (v2_gentle, --oem 3 --psm 8...): 
+OCR (v2_gentle, --oem 3 --psm 7...): |
+
+Processed image with v3_direct, shape: (900, 1200)
+OCR (v3_direct, --oem 3 --psm 6...): s a= *
+——SS=_ 3
+: —= x Sra 5
+SOV eormrmm emt of inci t
+& Sr Ses DP ee SSB e559 SSS" S DSS Ee
+Li LIMr
+Found Aadhaar with strict pattern: 505625973485
+OCR result: {'success': True, 'aadhaar': '505625973485', 'raw_text': 's a= *\n——SS=_ 3\n: —= x Sra 5\nSOV eormrmm emt of inci t\n& Sr Ses DP ee SSB e559 SSS" S DSS Ee\nLi LIMrIiQuce tAaomtiFicaAationm Arnutihority of Irmcti== Fs i\nesQ=s Srnrotrmrent Mo: 2710/0131 2/50042 ES -\nre BO\n2 Sse 7\nVirwconaa Viemiaket A\n= WES WIR ona Baratenes 4\n= Sacsa eer 3\n3 arare mandala\nB AMsakans :\nGast Gouavan Anan Pragesn — sssc16e :\nSeeasssess =\n= :\n= Stonau a\n= on EEE ;\n4 E3 SSS eee :\nPg Se ee\nSs <1225-5 =o essy 4 wou Haanser mo -:\nf i 5056 2597 3485\nf oe Wap - 9146 3974 3275 6238\nee | Te se as Ss SS\na ss Sese — $+\nar => (<Sovernment of inais = ——\n= a\na z Vinukonda Visaleakshi =\nea s >= Sa DOB: 0170171980\nza = BrP emace =\nae | = -| =\na GI = = =\n# sosse 2597 94s5\nNe = 946 3974 S275 S232 _-__~_--- >\n=S— Sa ed SS eel\n', 'confidence': 0.95, 'method': 'v3_direct'}
+Extracted Aadhaar: 505625973485, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '505625973485', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:0.27, Edges:0.50, Combined:0.44, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': 0.2721410925352119, 'edges': 0.5, 'orb_score': 0.6}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot A-002 to visitor chandra Vinukonda
+Emails sent for visit 8d0f8f4c-6d70-4efe-8ab7-bfc238b590ef
+Image loaded, shape: (1130, 720, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): —_— oe
+| / Bees |
+[eee ee
+
+y MITT Cece reread
+
+OCR (v1_aggressive, --oem 3 --psm 1...): ——SS—
+
+=
+
+=
+
+a
+
+2a
+
+‘
+
+at
+
+——
+
+\
+
+=
+
+afd haXeEy
+
+TOTS.
+
+‘
+
+1
+
+Gouees
+
+iB
+
+oe
+
+a8
+
+ee
+
+1
+
+Hi
+
+ne
+
+fig
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): =
+
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): bed Baa
+= ane
+= FOU es eNO ee
+a ee
+Do ---5 . Roms s/s Your No
+8071 4727 6803
+we 22a 5, SP mo60sD
+= e
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'bed Baa\n= ane\n= FOU es eNO ee\na ee\nDo ---5 . Roms s/s Your No\n8071 4727 6803\nwe 22a 5, SP mo60sD\n= eras Seocs\n= —“Swerment of rxtie\nSar\nwees ese\n8071 4727 6803 eo\nar evor5, =P Gost\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:-0.18, Edges:0.50, Combined:0.19, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': -0.17555963972475824, 'edges': 0.5, 'orb_score': 0.0}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot A-003 to visitor chandra Vinukonda
+Emails sent for visit 74bbafb7-e549-4af4-9280-4062ba45117d
+Image loaded, shape: (1130, 720, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): —_— oe
+| / Bees |
+[eee ee
+
+y MITT Cece reread
+
+OCR (v1_aggressive, --oem 3 --psm 1...): ——SS—
+
+=
+
+=
+
+a
+
+2a
+
+‘
+
+at
+
+——
+
+\
+
+=
+
+afd haXeEy
+
+TOTS.
+
+‘
+
+1
+
+Gouees
+
+iB
+
+oe
+
+a8
+
+ee
+
+1
+
+Hi
+
+ne
+
+fig
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): =
+
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): bed Baa
+= ane
+= FOU es eNO ee
+a ee
+Do ---5 . Roms s/s Your No
+8071 4727 6803
+we 22a 5, SP mo60sD
+= e
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'bed Baa\n= ane\n= FOU es eNO ee\na ee\nDo ---5 . Roms s/s Your No\n8071 4727 6803\nwe 22a 5, SP mo60sD\n= eras Seocs\n= —“Swerment of rxtie\nSar\nwees ese\n8071 4727 6803 eo\nar evor5, =P Gost\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:-0.26, Edges:0.50, Combined:0.16, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': -0.25820750348314486, 'edges': 0.5, 'orb_score': 0.0}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot B-001 to visitor chandra Vinukonda
+Emails sent for visit fe72b7ca-549f-4724-b3d1-6d489a9ac9d4
+Image loaded, shape: (1130, 720, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): —_— oe
+| / Bees |
+[eee ee
+
+y MITT Cece reread
+
+OCR (v1_aggressive, --oem 3 --psm 1...): ——SS—
+
+=
+
+=
+
+a
+
+2a
+
+‘
+
+at
+
+——
+
+\
+
+=
+
+afd haXeEy
+
+TOTS.
+
+‘
+
+1
+
+Gouees
+
+iB
+
+oe
+
+a8
+
+ee
+
+1
+
+Hi
+
+ne
+
+fig
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): =
+
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): bed Baa
+= ane
+= FOU es eNO ee
+a ee
+Do ---5 . Roms s/s Your No
+8071 4727 6803
+we 22a 5, SP mo60sD
+= e
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'bed Baa\n= ane\n= FOU es eNO ee\na ee\nDo ---5 . Roms s/s Your No\n8071 4727 6803\nwe 22a 5, SP mo60sD\n= eras Seocs\n= —“Swerment of rxtie\nSar\nwees ese\n8071 4727 6803 eo\nar evor5, =P Gost\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:-0.28, Edges:0.50, Combined:0.15, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': -0.28050685231929406, 'edges': 0.5, 'orb_score': 0.0}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot B-002 to visitor chandra Vinukonda
+Emails sent for visit 2bfa83fb-f9a7-48bd-8456-20f46189124d
+Image loaded, shape: (674, 551, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ae Sia att iy bee ——————e Se a
+ee _ CANS, |) 2 SSS aaa
+SS SS eS ST HSE || 3s ceeererstinres Vip SAC 
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'ae Sia att iy bee ——————e Se a\nee _ CANS, |) 2 SSS aaa\nSS SS eS ST HSE || 3s ceeererstinres Vip SAC AAR sce)\nGaSe | Sam INFORMATION. —\nSS éacnmanatinia = 4 ee)\n|_ witteienen Amen Wl) || Sea see os\nAG OeRISH Brmeioer Nos z7anmisiaisoer7ys |) | Sek ee eneaeee .\nae ES i fe 5) Ries oct mec o-aeaag odd eas Co eRSE Erde\nSKesBarremsiaes) i Pe ne A a Te ee\nCa meres i] | Seeker ie eesoareneee\nSP BRERA SES || | Sun Sotventywamtgenmcasonentencn Spotty ont oas\nOSOSSS 2 8071 2727 GRO | | Beate met oe ne occ\noa SNS EIN ROOT SEO i Fr aacuulyanen gat rg nbannertuenetion tac rIaes\nSP cn CES SEES EAS GSES Vinee A |$] _, |S Eaacenene Asgnbirarsctnato aber comme Sh .\n¢ Eee aaa |? ae ee\n_ _— 8071-4727 6803" oS x ns Se See Bee SO\n= 8071 4727 6803 ___— 6 SSS ee\n', 'confidence': 0.95, 'method': 'v1_aggressive'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:0.36, Edges:0.50, Combined:0.40, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': 0.3568484090388653, 'edges': 0.5, 'orb_score': 0.2}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot B-003 to visitor chandra Vinukonda
+Emails sent for visit efcebb25-6639-4538-8a7b-247bbc0f29f3
+Image loaded, shape: (674, 551, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ae Sia att iy bee ——————e Se a
+ee _ CANS, |) 2 SSS aaa
+SS SS eS ST HSE || 3s ceeererstinres Vip SAC 
+Found Aadhaar with strict pattern: 807147276803
+OCR result: {'success': True, 'aadhaar': '807147276803', 'raw_text': 'ae Sia att iy bee ——————e Se a\nee _ CANS, |) 2 SSS aaa\nSS SS eS ST HSE || 3s ceeererstinres Vip SAC AAR sce)\nGaSe | Sam INFORMATION. —\nSS éacnmanatinia = 4 ee)\n|_ witteienen Amen Wl) || Sea see os\nAG OeRISH Brmeioer Nos z7anmisiaisoer7ys |) | Sek ee eneaeee .\nae ES i fe 5) Ries oct mec o-aeaag odd eas Co eRSE Erde\nSKesBarremsiaes) i Pe ne A a Te ee\nCa meres i] | Seeker ie eesoareneee\nSP BRERA SES || | Sun Sotventywamtgenmcasonentencn Spotty ont oas\nOSOSSS 2 8071 2727 GRO | | Beate met oe ne occ\noa SNS EIN ROOT SEO i Fr aacuulyanen gat rg nbannertuenetion tac rIaes\nSP cn CES SEES EAS GSES Vinee A |$] _, |S Eaacenene Asgnbirarsctnato aber comme Sh .\n¢ Eee aaa |? ae ee\n_ _— 8071-4727 6803" oS x ns Se See Bee SO\n= 8071 4727 6803 ___— 6 SSS ee\n', 'confidence': 0.95, 'method': 'v1_aggressive'}
+Extracted Aadhaar: 807147276803, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '807147276803', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:0.59, Edges:0.50, Combined:0.52, Match:True
+Final face result: verified=True, confidence=75.0%
+Face verification: {'verified': True, 'confidence': 75.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verified', 'method': 'OpenCV LENIENT', 'lenient_mode': False, 'is_match': True, 'ssim': 0.5, 'histogram': 0.586375655174461, 'edges': 0.5, 'orb_score': 0.4}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot C-001 to visitor chandra Vinukonda
+Email sending failed for visit 0ee32bb7-c44f-49bd-a547-109d8bb40954: 'Visitor' object has no attribute 'email'
+Image loaded, shape: (1288, 989, 3)
+Processed image with v1_aggressive, shape: (600, 800)
+OCR (v1_aggressive, --oem 3 --psm 6...): ES ENS ||_ Sh SS ZN |
+i= TT :
+ILS) ehasicemaratnstebiensy sess I Siete oer enon ape
+q ne,
+
+ee ||| |e
+OCR (v1_aggressive, --oem 3 --psm 1...): ce
+
+ae
+
+‘i
+
+ig
+
+Se
+
+ee
+
+es
+
+6
+
+=
+
+ie
+
+ees
+
+Va
+
+=
+
+TINFORBATION,T
+
+ascinmats
+
+fel
+
+‘dees
+
+res
+
+aes
+
+S
+OCR (v1_aggressive, --oem 3 --psm 8...): 
+OCR (v1_aggressive, --oem 3 --psm 7...): 
+Processed image with v2_gentle, shape: (800, 1000)
+OCR (v2_gentle, --oem 3 --psm 6...): roe = ~aroas INFORMATION
+Goverment of india woe Sas arp args Baunetie gage ipa wESSe
+Unique Identifi
+Found Aadhaar with strict pattern: 924847835248
+OCR result: {'success': True, 'aadhaar': '924847835248', 'raw_text': 'roe = ~aroas INFORMATION\nGoverment of india woe Sas arp args Baunetie gage ipa wESSe\nUnique Identification Authority of india BES asthe te wr kev asta woe a Be\nOR RPAH mvolment Now! 0623/00743/02093 ee crepe\nMeese + scagma score\nbe eased measg / Your Aadhaar No. sm Note your monte nomen’ or ema pated a\n9248 4783 5248 © Seton mcuentntnctinmat ne emacs ate\na esarS, =r Sena (= Corres ceening svt ore ootgaten to soak concent\ni Sete jae mae\ni HEE SNR rsemet. |2]e eae\n9248 4783 5248 | SRS SEF Ses Soa\nSee a SEES S|; ae oe |\n', 'confidence': 0.95, 'method': 'v2_gentle'}
+Extracted Aadhaar: 924847835248, Manual Aadhaar: 807147276803
+Aadhaar checksum validation: {'valid': False, 'checksum': 'failed', 'aadhaar': '924847835248', 'error': 'Invalid Verhoeff checksum'}
+Face scores - SSIM:0.50, Hist:0.19, Edges:0.50, Combined:0.41, Match:False
+Face passed with lenient threshold
+Final face result: verified=True, confidence=65.0%
+Face verification: {'verified': True, 'confidence': 65.0, 'aadhaar_face_found': True, 'live_face_found': True, 'message': 'Face verification passed (lenient mode)', 'method': 'OpenCV LENIENT', 'lenient_mode': True, 'is_match': False, 'ssim': 0.5, 'histogram': 0.19312427028953838, 'edges': 0.5, 'orb_score': 0.6}
+Purpose analysis: {'approved': True, 'risk_score': 0.050000000000000044, 'category': 'safe', 'confidence': 0.95, 'message': 'Purpose OK: safe', 'matched_keyword': 'meeting'}
+Allocated parking slot C-002 to visitor chandra Vinukonda
+Emails sent for visit aa9708c3-4f1e-48c5-93f1-4c88470bc4a3

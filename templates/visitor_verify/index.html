@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Gate - Visitor Verification</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: #1a73e8; margin-bottom: 1.5rem; }
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        #webcam { width: 100%; border-radius: 10px; background: #222; margin-top: 10px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .btn-blue { background: #1a73e8; color: white; }
+        .btn-green { background: #34a853; color: white; margin-top: 20px; }
+        #status-box { margin-top: 15px; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.9rem; min-height: 20px; }
+        #preview { width: 100%; border-radius: 10px; display: none; margin-top: 10px; border: 2px solid #34a853; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Visitor Entry</h2>
+    
+    <div id="visitorFormContainer">
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="John Doe">
+        </div>
+        <div class="input-group">
+            <label>Aadhaar Number</label>
+            <input type="text" id="aadhaar" maxlength="12" placeholder="1234 5678 9012">
+        </div>
+        <div class="input-group">
+            <label>Flat Number</label>
+            <input type="text" id="flat" placeholder="B-402">
+        </div>
+        <div class="input-group">
+            <label>Purpose</label>
+            <input type="text" id="purpose" placeholder="Maintenance / Guest">
+        </div>
+        <div class="input-group">
+            <label>Aadhaar Photo (Upload)</label>
+            <input type="file" id="aadhaarPhoto" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <label>Live Face Scan</label>
+            <video id="webcam" autoplay playsinline></video>
+            <img id="preview" alt="Snapshot">
+            <button type="button" class="btn btn-blue" id="captureBtn">📷 Capture Selfie</button>
+        </div>
+
+        <button type="button" class="btn btn-green" id="submitBtn">Verify & Generate Token</button>
+        
+        <div id="status-box"></div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('webcam');
+    const captureBtn = document.getElementById('captureBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const preview = document.getElementById('preview');
+    const statusBox = document.getElementById('status-box');
+    
+    let liveBlob = null;
+
+    // 1. Initialize Camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { 
+            statusBox.innerHTML = "❌ Camera Error: " + err;
+            statusBox.style.backgroundColor = "#fee";
+        });
+
+    // 2. Capture Logic
+    captureBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(blob => {
+            liveBlob = blob;
+            preview.src = URL.createObjectURL(blob);
+            preview.style.display = 'block';
+            video.style.display = 'none';
+            statusBox.innerText = "✅ Selfie Captured!";
+            statusBox.style.color = "#34a853";
+        }, 'image/jpeg', 0.9);
+    });
+
+    // 3. Robust Submit Logic
+    submitBtn.addEventListener('click', async () => {
+        // Clear previous status
+        statusBox.innerText = "Starting Verification...";
+        statusBox.style.color = "#555";
+
+        // Validate Inputs
+        const name = document.getElementById('name').value;
+        const aadhaar = document.getElementById('aadhaar').value;
+        const flat = document.getElementById('flat').value;
+        const purpose = document.getElementById('purpose').value;
+        const aadhaarFile = document.getElementById('aadhaarPhoto').files[0];
+
+        if (!name || !aadhaar || !flat || !aadhaarFile || !liveBlob) {
+            statusBox.innerText = "❌ Please fill all fields and take a selfie.";
+            statusBox.style.color = "red";
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "⌛ Processing ML Model...";
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('aadhaar_number', aadhaar);
+        formData.append('flat_number', flat);
+        formData.append('purpose', purpose);
+        formData.append('aadhaar_photo', aadhaarFile);
+        formData.append('live_photo', liveBlob, 'live.jpg');
+
+        try {
+            console.log("Sending POST request to backend...");
+            const response = await fetch('/visitor_verify/api/register-visitor/', {
+                method: 'POST', // STRICTLY POST
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                statusBox.innerHTML = `<strong>✅ Verification Successful!</strong><br>Parking Slot: ${result.parking}`;
+                statusBox.style.color = "green";
+                submitBtn.innerText = "Success";
+            } else {
+                statusBox.innerHTML = `<strong>❌ Error:</strong> ${result.message}`;
+                statusBox.style.color = "red";
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Retry Verification";
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+            statusBox.innerText = "❌ Server Connection Failed.";
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>

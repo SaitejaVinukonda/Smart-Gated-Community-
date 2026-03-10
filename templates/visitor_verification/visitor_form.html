@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartGate — Visitor Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #070b12;
+    --surface:   #0d1321;
+    --border:    #1a2540;
+    --border-hi: #2a3f6f;
+    --amber:     #f59e0b;
+    --amber-dim: #92600a;
+    --amber-glow:#f59e0b40;
+    --cyan:      #06b6d4;
+    --cyan-glow: #06b6d430;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --text:      #e2e8f0;
+    --text-muted:#64748b;
+    --text-dim:  #94a3b8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BG ─────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,158,11,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,.08) 0%, transparent 70%);
+    top: -200px; right: -200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LAYOUT ──────────────────────────────── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  /* ── HEADER ──────────────────────────────── */
+  .site-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    animation: fadeSlideDown .6s ease both;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--amber), #d97706);
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 20px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -.02em;
+  }
+
+  .logo-text span { color: var(--amber); }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse-dot 1.5s ease infinite;
+  }
+
+  /* ── PAGE TITLE ──────────────────────────── */
+  .page-title {
+    margin-bottom: 40px;
+    animation: fadeSlideDown .7s ease .1s both;
+  }
+
+  .page-title h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+  }
+
+  .page-title h1 em {
+    font-style: normal;
+    color: var(--amber);
+  }
+
+  .page-title p {
+    margin-top: 10px;
+    font-size: .9rem;
+    color: var(--text-muted);
+    max-width: 480px;
+  }
+
+  /* ── STEPPER ─────────────────────────────── */
+  .stepper {
+    display: flex; gap: 0;
+    margin-bottom: 40px;
+    animation: fadeSlideDown .7s ease .2s both;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .step {
+    flex: 1;
+    padding: 14px 16px;
+    background: var(--surface);
+    display: flex; align-items: center; gap: 10px;
+    border-right: 1px solid var(--border);
+    transition: background .3s;
+    cursor: default;
+  }
+
+  .step:last-child { border-right: none; }
+
+  .step.active {
+    background: #111827;
+    border-bottom: 2px solid var(--amber);
+  }
+
+  .step.done { background: #0a1a0e; border-bottom: 2px solid var(--green); }
+
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-hi);
+    display: grid; place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    flex-shrink: 0;
+    transition: all .3s;
+  }
+
+  .step.active .step-num {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .step.done .step-num {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  .step-info { min-width: 0; }
+
+  .step-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .step.active .step-label { color: var(--amber); }
+  .step.done .step-label   { color: var(--green); }
+
+  .step-desc {
+    font-size: .75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── MAIN GRID ───────────────────────────── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    animation: fadeSlideUp .7s ease .3s both;
+  }
+
+  @media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .stepper { display: none; }
+  }
+
+  /* ── CARD ────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color .3s;
+  }
+
+  .card:hover { border-color: var(--border-hi); }
+
+  .card-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .card-icon {
+    width: 34px; height: 34px;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-dim);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+    letter-spacing: -.01em;
+  }
+
+  .card-badge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--border);
+    color: var(--text-muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .card-badge.required {
+    background: rgba(245,158,11,.12);
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+  }
+
+  .card-body { padding: 22px; }
+
+  /* ── WEBCAM MODULE ───────────────────────── */
+  .webcam-container {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  #webcam-video, #webcam-canvas {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #webcam-canvas { display: none; }
+
+  .webcam-overlay {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+
+  /* Corner brackets */
+  .corner {
+    position: absolute;
+    width: 28px; height: 28px;
+    border-color: var(--amber);
+    border-style: solid;
+  }
+
+  .corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+  .corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+  .scan-line {
+    position: absolute;
+    left: 12px; right: 12px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    top: 12px;
+    animation: scanMove 2.5s ease-in-out infinite;
+  }
+
+  .face-guide {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .face-oval {
+    width: 120px; height: 150px;
+    border: 2px dashed rgba(245,158,11,.4);
+    border-radius: 50%;
+  }
+
+  .webcam-status {
+    position: absolute;
+    bottom: 10px; left: 10px; right: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .webcam-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+  }
+
+  .webcam-badge.live {
+    background: rgba(239,68,68,.85);
+    color: #fff;
+  }
+
+  .webcam-badge.ready {
+    background: rgba(34,197,94,.85);
+    color: #000;
+    font-weight: 700;
+  }
+
+  #captured-preview {
+    display: none;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .webcam-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ── AADHAAR UPLOAD ──────────────────────── */
+  .upload-zone {
+    border: 2px dashed var(--border-hi);
+    border-radius: 10px;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .3s;
+    background: rgba(255,255,255,.01);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upload-zone:hover {
+    border-color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .upload-zone.has-file {
+    border-color: var(--green);
+    background: rgba(34,197,94,.05);
+  }
+
+  .upload-zone input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .upload-icon { font-size: 2rem; margin-bottom: 10px; }
+
+  .upload-text {
+    font-size: .85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .upload-text strong { color: var(--text); }
+
+  .file-preview {
+    display: none;
+    margin-top: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 160px;
+    position: relative;
+  }
+
+  .file-preview img {
+    width: 100%; height: 160px;
+    object-fit: cover;
+  }
+
+  .file-preview-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.7);
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    color: var(--green);
+  }
+
+  /* ── FORM FIELDS ─────────────────────────── */
+  .field-group { margin-bottom: 18px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+  }
+
+  label .req { color: var(--amber); margin-left: 3px; }
+
+  input[type=text],
+  input[type=tel],
+  input[type=email],
+  input[type=number],
+  select,
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border-hi);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: .88rem;
+    outline: none;
+    transition: all .2s;
+    appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--amber);
+    background: rgba(245,158,11,.04);
+    box-shadow: 0 0 0 3px var(--amber-glow);
+  }
+
+  textarea { resize: vertical; min-height: 90px; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .input-hint {
+    margin-top: 5px;
+    font-size: .72rem;
+    color: var(--text-muted);
+  }
+
+  /* ── NLP PURPOSE BOX ─────────────────────── */
+  .purpose-wrapper { position: relative; }
+
+  .purpose-indicator {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+
+  .purpose-indicator.safe {
+    background: rgba(34,197,94,.15);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,.3);
+    opacity: 1;
+  }
+
+  .purpose-indicator.risky {
+    background: rgba(239,68,68,.15);
+    color: var(--red);
+    border: 1px solid rgba(239,68,68,.3);
+    opacity: 1;
+  }
+
+  /* ── RESIDENT CARD SELECTOR ──────────────── */
+  .resident-list {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hi) transparent;
+    padding-right: 4px;
+  }
+
+  .resident-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s;
+    user-select: none;
+  }
+
+  .resident-card:hover { border-color: var(--border-hi); background: rgba(255,255,255,.04); }
+
+  .resident-card.selected {
+    border-color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .resident-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber-dim), #7c4a1f);
+    display: grid; place-items: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+
+  .resident-info { flex: 1; min-width: 0; }
+
+  .resident-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .resident-flat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .resident-status {
+    font-size: .7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .s-home    { background: rgba(34,197,94,.15);  color: var(--green); }
+  .s-away    { background: rgba(239,68,68,.15);   color: var(--red); }
+  .s-dnd     { background: rgba(245,158,11,.15);  color: var(--amber); }
+
+  .resident-search {
+    margin-bottom: 10px;
+  }
+
+  /* ── SUBMIT BUTTON ───────────────────────── */
+  .submit-section {
+    margin-top: 28px;
+    animation: fadeSlideUp .7s ease .5s both;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: -.01em;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--amber), #d97706);
+    color: #000;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(245,158,11,.25);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(245,158,11,.35);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-primary:disabled {
+    opacity: .4; cursor: not-allowed;
+    transform: none; box-shadow: none;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-hi);
+    color: var(--text);
+    width: 100%;
+  }
+
+  .btn-outline:hover { border-color: var(--amber); color: var(--amber); }
+
+  .btn-sm { padding: 9px 16px; font-size: .82rem; }
+
+  .btn-danger {
+    background: rgba(239,68,68,.15);
+    border: 1px solid rgba(239,68,68,.3);
+    color: var(--red);
+    width: 100%;
+  }
+
+  /* ── VERIFICATION PROGRESS ───────────────── */
+  #verification-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(7,11,18,.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    place-items: center;
+  }
+
+  #verification-overlay.show { display: grid; }
+
+  .verify-panel {
+    width: 90%; max-width: 520px;
+    background: var(--surface);
+    border: 1px solid var(--border-hi);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: scaleIn .4s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .verify-header {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .verify-spinner {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--amber);
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  .verify-spinner.done {
+    border-color: var(--green);
+    border-top-color: var(--green);
+    animation: none;
+    background: rgba(34,197,94,.1);
+    display: grid; place-items: center;
+    font-size: 1.8rem;
+  }
+
+  .verify-spinner.fail {
+    border-color: var(--red);
+    border-top-color: var(--red);
+    animation: none;
+    background: rgba(239,68,68,.1);
+    display: grid; place-items: center;
+    font-size: 1.8rem;
+  }
+
+  .verify-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+
+  .verify-subtitle {
+    font-size: .82rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .verify-steps {
+    padding: 20px 28px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .verify-step {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all .3s;
+  }
+
+  .verify-step.running {
+    border-color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .verify-step.pass {
+    border-color: rgba(34,197,94,.3);
+    background: rgba(34,197,94,.05);
+  }
+
+  .verify-step.fail {
+    border-color: rgba(239,68,68,.3);
+    background: rgba(239,68,68,.05);
+  }
+
+  .vs-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--border);
+    display: grid; place-items: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    transition: all .3s;
+  }
+
+  .verify-step.running .vs-icon { background: rgba(245,158,11,.2); }
+  .verify-step.pass .vs-icon    { background: rgba(34,197,94,.2); }
+  .verify-step.fail .vs-icon    { background: rgba(239,68,68,.2); }
+
+  .vs-info { flex: 1; min-width: 0; }
+
+  .vs-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+  }
+
+  .vs-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    transition: color .3s;
+  }
+
+  .verify-step.running .vs-detail { color: var(--amber); }
+  .verify-step.pass .vs-detail    { color: var(--green); }
+  .verify-step.fail .vs-detail    { color: var(--red); }
+
+  .vs-indicator {
+    font-size: 1rem;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+
+  .verify-step.running .vs-indicator,
+  .verify-step.pass .vs-indicator,
+  .verify-step.fail .vs-indicator { opacity: 1; }
+
+  .verify-step.running .vs-indicator::after { content: '⟳'; animation: spin 1s linear infinite; display: inline-block; }
+  .verify-step.pass .vs-indicator::after    { content: '✓'; color: var(--green); }
+  .verify-step.fail .vs-indicator::after    { content: '✗'; color: var(--red); }
+
+  /* ── QR RESULT ───────────────────────────── */
+  .result-section {
+    padding: 0 28px 28px;
+    display: none;
+  }
+
+  .result-section.show { display: block; }
+
+  .qr-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  #qr-display {
+    width: 180px; height: 180px;
+    margin: 0 auto 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: grid; place-items: center;
+  }
+
+  #qr-display img { width: 100%; height: 100%; border-radius: 8px; }
+
+  .qr-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    color: #475569;
+    letter-spacing: .04em;
+  }
+
+  .qr-token {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    color: #0f172a;
+    word-break: break-all;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+
+  .result-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .result-meta-item {
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .rmi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+
+  .rmi-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+  }
+
+  .rmi-value.success { color: var(--green); }
+  .rmi-value.warn    { color: var(--amber); }
+  .rmi-value.danger  { color: var(--red); }
+
+  .denied-banner {
+    background: rgba(239,68,68,.08);
+    border: 1px solid rgba(239,68,68,.25);
+    border-radius: 10px;
+    padding: 18px 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .denied-icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .denied-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--red);
+  }
+  .denied-reason {
+    font-size: .8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ── CONFIDENCE BAR ──────────────────────── */
+  .confidence-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .confidence-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+    background: linear-gradient(90deg, var(--green), #86efac);
+  }
+
+  .confidence-fill.low { background: linear-gradient(90deg, var(--red), #fca5a5); }
+  .confidence-fill.med { background: linear-gradient(90deg, var(--amber), #fde68a); }
+
+  /* ── FACE COMPARISON ─────────────────────── */
+  .face-compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .face-box {
+    text-align: center;
+  }
+
+  .face-box img {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-hi);
+  }
+
+  .face-box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .face-vs {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ── ANIMATIONS ──────────────────────────── */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .5; transform: scale(.8); }
+  }
+
+  @keyframes scanMove {
+    0%   { top: 14px; }
+    50%  { top: calc(100% - 14px); }
+    100% { top: 14px; }
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .loading-shimmer {
+    background: linear-gradient(90deg,
+      var(--border) 0%, rgba(255,255,255,.06) 50%, var(--border) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* ── SCROLLBAR ───────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+  /* ── TOAST ───────────────────────────────── */
+  .toast-container {
+    position: fixed;
+    top: 20px; right: 20px;
+    z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border-hi);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: .82rem;
+    animation: fadeSlideDown .3s ease;
+    min-width: 260px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+
+  .toast.success { border-color: rgba(34,197,94,.4); }
+  .toast.error   { border-color: rgba(239,68,68,.4); }
+  .toast.info    { border-color: rgba(245,158,11,.4); }
+</style>
+</head>
+
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Verification Overlay -->
+<div id="verification-overlay">
+  <div class="verify-panel">
+    <div class="verify-header">
+      <div class="verify-spinner" id="verify-spinner">🔐</div>
+      <div class="verify-title" id="verify-title">Verifying Identity</div>
+      <div class="verify-subtitle" id="verify-subtitle">Running security checks...</div>
+    </div>
+
+    <div class="verify-steps">
+      <div class="verify-step" id="vs-ocr">
+        <div class="vs-icon">🪪</div>
+        <div class="vs-info">
+          <div class="vs-label">Aadhaar OCR Scan</div>
+          <div class="vs-detail" id="vs-ocr-detail">Extracting card data...</div>
+        </div>
+        <div class="vs-indicator"></div>
+      </div>
+
+      <div class="verify-step" id="vs-face">
+        <div class="vs-icon">👁</div>
+        <div class="vs-info">
+          <div class="vs-label">Biometric Face Match</div>
+          <div class="vs-detail" id="vs-face-detail">Comparing facial geometry...</div>
+        </div>
+        <div class="vs-indicator"></div>
+      </div>
+
+      <div class="verify-step" id="vs-resident">
+        <div class="vs-icon">🏠</div>
+        <div class="vs-info">
+          <div class="vs-label">Resident Availability</div>
+          <div class="vs-detail" id="vs-resident-detail">Checking resident status...</div>
+        </div>
+        <div class="vs-indicator"></div>
+      </div>
+
+      <div class="verify-step" id="vs-nlp">
+        <div class="vs-icon">🧠</div>
+        <div class="vs-info">
+          <div class="vs-label">NLP Purpose Analysis</div>
+          <div class="vs-detail" id="vs-nlp-detail">Analyzing intent...</div>
+        </div>
+        <div class="vs-indicator"></div>
+      </div>
+
+      <div class="verify-step" id="vs-qr">
+        <div class="vs-icon">📱</div>
+        <div class="vs-info">
+          <div class="vs-label">QR Pass Generation</div>
+          <div class="vs-detail" id="vs-qr-detail">Awaiting checks...</div>
+        </div>
+        <div class="vs-indicator"></div>
+      </div>
+    </div>
+
+    <div class="result-section" id="result-section">
+      <!-- filled dynamically -->
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="wrapper">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo">
+      <div class="logo-icon">🛡</div>
+      <div class="logo-text">Smart<span>Gate</span></div>
+    </div>
+    <div class="header-meta">
+      <div><span class="live-dot"></span>SYSTEM ONLINE</div>
+      <div id="live-clock">—</div>
+    </div>
+  </header>
+
+  <!-- Page Title -->
+  <div class="page-title">
+    <h1>Visitor <em>Verification</em><br>Portal</h1>
+    <p>Complete all steps below. Face recognition, Aadhaar validation, and NLP intent analysis run automatically.</p>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step active" id="step-1">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <div class="step-label">Identity</div>
+        <div class="step-desc">Aadhaar + Biometrics</div>
+      </div>
+    </div>
+    <div class="step" id="step-2">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <div class="step-label">Resident</div>
+        <div class="step-desc">Select who to visit</div>
+      </div>
+    </div>
+    <div class="step" id="step-3">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <div class="step-label">Purpose</div>
+        <div class="step-desc">NLP intent check</div>
+      </div>
+    </div>
+    <div class="step" id="step-4">
+      <div class="step-num">4</div>
+      <div class="step-info">
+        <div class="step-label">Access Pass</div>
+        <div class="step-desc">QR + Email dispatch</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Form -->
+  <form id="verification-form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="main-grid">
+
+      <!-- LEFT COL ───────────────────────────── -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Webcam Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">📷</div>
+            <div class="card-title">Live Photo Capture</div>
+            <div class="card-badge required">Required</div>
+          </div>
+          <div class="card-body">
+            <div class="webcam-container" id="webcam-container">
+              <video id="webcam-video" autoplay playsinline muted></video>
+              <canvas id="webcam-canvas"></canvas>
+              <img id="captured-preview" alt="Captured"/>
+              <div class="webcam-overlay">
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+                <div class="scan-line" id="scan-line"></div>
+                <div class="face-guide">
+                  <div class="face-oval" id="face-oval"></div>
+                </div>
+              </div>
+              <div class="webcam-status">
+                <span class="webcam-badge live" id="webcam-badge">● LIVE</span>
+                <span id="webcam-resolution" style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.4)"></span>
+              </div>
+            </div>
+
+            <div class="webcam-controls">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-capture" onclick="capturePhoto()">
+                📸 Capture
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-retake" onclick="retakePhoto()" style="display:none">
+                🔄 Retake
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-start-cam" onclick="startWebcam()" style="display:none">
+                📷 Start Camera
+              </button>
+            </div>
+
+            <input type="hidden" id="live_photo" name="live_photo"/>
+
+            <!-- Face match preview (shown after verification) -->
+            <div class="face-compare" id="face-compare-box" style="display:none;margin-top:14px">
+              <div class="face-box">
+                <img id="fc-live" src="" alt="Live"/>
+                <div class="face-box-label">LIVE CAPTURE</div>
+              </div>
+              <div class="face-vs">vs</div>
+              <div class="face-box">
+                <img id="fc-aadhaar" src="" alt="Aadhaar"/>
+                <div class="face-box-label">AADHAAR CARD</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aadhaar Upload -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🪪</div>
+            <div class="card-title">Aadhaar Card</div>
+            <div class="card-badge required">Required</div>
+          </div>
+          <div class="card-body">
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" name="aadhaar_image" id="aadhaar_image" accept="image/*" onchange="handleAadhaarUpload(this)"/>
+              <div class="upload-icon">🪪</div>
+              <div class="upload-text">
+                <strong>Upload Aadhaar Card</strong><br>
+                Front side — JPG, PNG up to 5MB
+              </div>
+            </div>
+            <div class="file-preview" id="aadhaar-preview">
+              <img id="aadhaar-preview-img" src="" alt="Aadhaar"/>
+              <div class="file-preview-label">✓ Aadhaar card loaded</div>
+            </div>
+
+            <div class="field-group" style="margin-top:16px">
+              <label>Aadhaar Number <span class="req">*</span></label>
+              <input type="text" name="aadhaar_number" id="aadhaar_number"
+                     maxlength="14" placeholder="XXXX XXXX XXXX"
+                     oninput="formatAadhaar(this)"/>
+              <div class="input-hint">Will be auto-filled from card OCR</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COL ──────────────────────────── -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Visitor Info -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">👤</div>
+            <div class="card-title">Visitor Information</div>
+            <div class="card-badge required">Required</div>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field-group">
+                <label>Full Name <span class="req">*</span></label>
+                <input type="text" name="visitor_name" id="visitor_name" placeholder="As on Aadhaar"/>
+              </div>
+              <div class="field-group">
+                <label>Phone <span class="req">*</span></label>
+                <input type="tel" name="phone" id="phone" placeholder="+91 XXXXX XXXXX"/>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Email Address</label>
+              <input type="email" name="visitor_email" id="visitor_email" placeholder="visitor@email.com"/>
+              <div class="input-hint">QR pass will be sent here on approval</div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Gate Number</label>
+                <select name="gate_number">
+                  <option value="MAIN">Main Gate</option>
+                  <option value="NORTH">North Gate</option>
+                  <option value="SOUTH">South Gate</option>
+                  <option value="EAST">East Gate</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Vehicle Number</label>
+                <input type="text" name="vehicle_number" placeholder="TN XX XXXX (opt)"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resident Selector -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🏠</div>
+            <div class="card-title">Select Resident to Visit</div>
+            <div class="card-badge required">Required</div>
+          </div>
+          <div class="card-body">
+            <div class="resident-search">
+              <input type="text" id="resident-search-input" placeholder="🔍  Search by name or flat..." oninput="filterResidents(this.value)"/>
+            </div>
+            <input type="hidden" name="resident_id" id="resident_id"/>
+            <div class="resident-list" id="resident-list">
+              <!-- Populated from Django template / JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Purpose Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">Purpose of Visit</div>
+            <div class="card-badge">NLP Analyzed</div>
+          </div>
+          <div class="card-body">
+            <div class="field-group">
+              <label>Describe your purpose <span class="req">*</span></label>
+              <div class="purpose-wrapper">
+                <textarea name="purpose" id="purpose" rows="3"
+                  placeholder="e.g. I am delivering a parcel for Amazon / visiting my family for Diwali..."
+                  oninput="analyzePurpose(this.value)"></textarea>
+                <div class="purpose-indicator" id="purpose-indicator"></div>
+              </div>
+              <div class="input-hint" id="purpose-hint">Be specific — vague purposes may be flagged.</div>
+            </div>
+            <div id="purpose-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-section">
+      <button type="submit" class="btn btn-primary" id="btn-submit">
+        <span>🛡</span> Begin Identity Verification
+      </button>
+      <div style="margin-top:10px;text-align:center;font-size:.75rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace">
+        All data is encrypted and securely processed. Aadhaar data is used solely for verification.
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+// ── DATA: Fetch from backend API ─────────────────────────────────────
+let RESIDENTS = [];
+
+// Fetch residents from Django backend
+async function loadResidents() {
+  try {
+    const response = await fetch('/visitor_verification/api/residents/');
+    if (!response.ok) throw new Error('Failed to fetch residents');
+    const data = await response.json();
+    RESIDENTS = data.residents || [];
+    renderResidents(RESIDENTS);
+  } catch (error) {
+    console.error('Error loading residents:', error);
+    showToast('error', '🏠', 'Failed to load residents. Please try again.');
+    // Fallback to try rendering empty or use backup data
+    renderResidents([]);
+  }
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let videoStream = null;
+let capturedPhotoBase64 = null;
+let selectedResident = null;
+let purposeTimer = null;
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent =
+    now.toLocaleTimeString('en-IN', { hour12: false }) +
+    ' IST ' + now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── RESIDENT RENDER ───────────────────────────────────────────────────────────
+function renderResidents(list) {
+  const container = document.getElementById('resident-list');
+  container.innerHTML = '';
+  if (!list.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:.8rem">No residents found</div>';
+    return;
+  }
+  list.forEach(r => {
+    const statusLabel = { home: 'HOME', away: 'AWAY', dnd: 'DND' }[r.status];
+    const statusClass = { home: 's-home', away: 's-away', dnd: 's-dnd' }[r.status];
+    const el = document.createElement('div');
+    el.className = 'resident-card';
+    el.dataset.id = r.id;
+    el.innerHTML = `
+      <div class="resident-avatar">${r.initials}</div>
+      <div class="resident-info">
+        <div class="resident-name">${r.name}</div>
+        <div class="resident-flat">Block ${r.block} · Flat ${r.flat}</div>
+      </div>
+      <div class="resident-status ${statusClass}">${statusLabel}</div>
+    `;
+    el.onclick = () => selectResident(r, el);
+    container.appendChild(el);
+  });
+}
+
+function filterResidents(query) {
+  const q = query.toLowerCase();
+  const filtered = RESIDENTS.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    r.flat.toLowerCase().includes(q) ||
+    r.block.toLowerCase().includes(q)
+  );
+  renderResidents(filtered);
+  if (selectedResident) {
+    const selected = document.querySelector(`.resident-card[data-id="${selectedResident.id}"]`);
+    if (selected) selected.classList.add('selected');
+  }
+}
+
+function selectResident(resident, el) {
+  document.querySelectorAll('.resident-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedResident = resident;
+  document.getElementById('resident_id').value = resident.id;
+
+  if (resident.status === 'away') {
+    showToast('warning', '⚠️', `${resident.name} is currently away. Verification may still proceed.`);
+  } else if (resident.status === 'dnd') {
+    showToast('error', '🚫', `${resident.name} has set Do Not Disturb. Access likely to be denied.`);
+  }
+
+  // Advance stepper
+  markStepDone(2);
+  setStepActive(3);
+}
+
+renderResidents(RESIDENTS);
+
+// ── WEBCAM ────────────────────────────────────────────────────────────────────
+async function startWebcam() {
+  try {
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+    });
+    const video = document.getElementById('webcam-video');
+    video.srcObject = videoStream;
+    video.style.display = 'block';
+    document.getElementById('captured-preview').style.display = 'none';
+    document.getElementById('btn-capture').style.display = 'flex';
+    document.getElementById('btn-retake').style.display = 'none';
+    document.getElementById('btn-start-cam').style.display = 'none';
+    document.getElementById('webcam-badge').textContent = '● LIVE';
+    document.getElementById('webcam-badge').className = 'webcam-badge live';
+    document.getElementById('scan-line').style.display = 'block';
+    document.getElementById('face-oval').style.display = 'block';
+
+    video.onloadedmetadata = () => {
+      document.getElementById('webcam-resolution').textContent =
+        `${video.videoWidth}×${video.videoHeight}`;
+    };
+  } catch (err) {
+    showToast('error', '📷', 'Camera access denied. Please allow camera permissions.');
+    document.getElementById('btn-start-cam').style.display = 'flex';
+    document.getElementById('btn-capture').style.display = 'none';
+  }
+}
+
+function capturePhoto() {
+  const video = document.getElementById('webcam-video');
+  const canvas = document.getElementById('webcam-canvas');
+  const preview = document.getElementById('captured-preview');
+
+  if (!videoStream || !video.videoWidth) {
+    showToast('error', '📷', 'Camera not ready. Please wait...');
+    return;
+  }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+
+  capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.92);
+  document.getElementById('live_photo').value = capturedPhotoBase64;
+
+  preview.src = capturedPhotoBase64;
+  preview.style.display = 'block';
+  video.style.display = 'none';
+
+  // Stop stream
+  videoStream.getTracks().forEach(t => t.stop());
+  videoStream = null;
+
+  document.getElementById('btn-capture').style.display = 'none';
+  document.getElementById('btn-retake').style.display = 'flex';
+  document.getElementById('webcam-badge').textContent = '✓ CAPTURED';
+  document.getElementById('webcam-badge').className = 'webcam-badge ready';
+  document.getElementById('scan-line').style.display = 'none';
+  document.getElementById('face-oval').style.display = 'none';
+
+  showToast('success', '📸', 'Photo captured successfully!');
+  markStepDone(1);
+  setStepActive(2);
+}
+
+function retakePhoto() {
+  capturedPhotoBase64 = null;
+  document.getElementById('live_photo').value = '';
+  document.getElementById('btn-retake').style.display = 'none';
+  document.getElementById('btn-start-cam').style.display = 'flex';
+  document.getElementById('captured-preview').style.display = 'none';
+  document.getElementById('webcam-badge').textContent = '● LIVE';
+  document.getElementById('webcam-badge').className = 'webcam-badge live';
+  setStepActive(1);
+  unmarkStep(1);
+}
+
+// Auto-start webcam
+startWebcam();
+
+// ── AADHAAR UPLOAD ────────────────────────────────────────────────────────────
+function handleAadhaarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('aadhaar-preview-img').src = e.target.result;
+    document.getElementById('aadhaar-preview').style.display = 'block';
+    document.getElementById('upload-zone').classList.add('has-file');
+    showToast('success', '🪪', 'Aadhaar card uploaded. OCR will run during verification.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function formatAadhaar(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 12);
+  input.value = v.replace(/(\d{4})(\d{4})?(\d{4})?/, (_, a, b, c) =>
+    [a, b, c].filter(Boolean).join(' ')
+  );
+}
+
+// ── PURPOSE NLP (Client-side preview) ────────────────────────────────────────
+const SAFE_PATTERNS = [
+  /deliver|parcel|package|courier|amazon|flipkart|swiggy|zomato/i,
+  /visit|meet|family|friend|relative|guest|uncle|aunt|mother|father/i,
+  /repair|fix|plumber|electrician|carpenter|maintenance|service/i,
+  /doctor|nurse|medical|medicine|health|emergency/i,
+  /maid|cook|clean|domestic|housekeep/i,
+  /official|police|government|bank|document|survey/i,
+];
+
+const RISKY_PATTERNS = [
+  /weapon|gun|knife|bomb|explosive/i,
+  /steal|rob|theft|attack|harm|kill|threat/i,
+  /force|illegal|drug|trespass/i,
+];
+
+const PURPOSE_SUGGESTIONS = [
+  'Delivering a parcel/package',
+  'Meeting family/relative',
+  'Home maintenance or repair',
+  'Food delivery (Swiggy/Zomato)',
+  'Official/Government work',
+  'Domestic service (maid/cook)',
+];
+
+function analyzePurpose(text) {
+  clearTimeout(purposeTimer);
+  const indicator = document.getElementById('purpose-indicator');
+  const hint = document.getElementById('purpose-hint');
+  const tags = document.getElementById('purpose-tags');
+
+  if (text.length < 5) {
+    indicator.className = 'purpose-indicator';
+    hint.textContent = 'Be specific — vague purposes may be flagged.';
+    renderSuggestions(tags);
+    return;
+  }
+
+  purposeTimer = setTimeout(() => {
+    const isRisky  = RISKY_PATTERNS.some(p => p.test(text));
+    const isSafe   = SAFE_PATTERNS.some(p => p.test(text));
+
+    if (isRisky) {
+      indicator.textContent = '⚠ FLAGGED';
+      indicator.className = 'purpose-indicator risky';
+      hint.textContent = '🚨 Suspicious keywords detected — visit may be denied.';
+      hint.style.color = 'var(--red)';
+      tags.innerHTML = '';
+    } else if (isSafe) {
+      indicator.textContent = '✓ SAFE';
+      indicator.className = 'purpose-indicator safe';
+      hint.textContent = '✓ Purpose looks appropriate.';
+      hint.style.color = 'var(--green)';
+      tags.innerHTML = '';
+    } else {
+      indicator.textContent = '? UNCLEAR';
+      indicator.className = 'purpose-indicator';
+      indicator.style.opacity = '1';
+      indicator.style.background = 'rgba(100,116,139,.2)';
+      indicator.style.color = 'var(--text-muted)';
+      indicator.style.border = '1px solid var(--border)';
+      hint.textContent = 'Please provide more detail for faster processing.';
+      hint.style.color = 'var(--text-muted)';
+      renderSuggestions(tags);
+    }
+  }, 400);
+}
+
+function renderSuggestions(container) {
+  container.innerHTML = PURPOSE_SUGGESTIONS.map(s =>
+    `<button type="button" onclick="useSuggestion('${s}')"
+      style="background:var(--border);border:1px solid var(--border-hi);color:var(--text-dim);
+             padding:4px 10px;border-radius:6px;font-size:.7rem;cursor:pointer;
+             font-family:'JetBrains Mono',monospace;transition:all .2s"
+      onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'"
+      onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text-dim)'">${s}</button>`
+  ).join('');
+}
+
+function useSuggestion(text) {
+  const ta = document.getElementById('purpose');
+  ta.value = text;
+  analyzePurpose(text);
+}
+
+// ── STEPPER ───────────────────────────────────────────────────────────────────
+function setStepActive(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`step-${i}`);
+    if (el) el.classList.toggle('active', i === n);
+  }
+}
+
+function markStepDone(n) {
+  const el = document.getElementById(`step-${n}`);
+  if (el) { el.classList.remove('active'); el.classList.add('done'); }
+  const numEl = el?.querySelector('.step-num');
+  if (numEl) numEl.textContent = '✓';
+}
+
+function unmarkStep(n) {
+  const el = document.getElementById(`step-${n}`);
+  if (el) { el.classList.remove('done'); el.classList.add('active'); }
+  const numEl = el?.querySelector('.step-num');
+  if (numEl) numEl.textContent = n;
+}
+
+// ── VERIFICATION PIPELINE ─────────────────────────────────────────────────────
+const VS_STEPS = ['vs-ocr', 'vs-face', 'vs-resident', 'vs-nlp', 'vs-qr'];
+
+function setVerifyStep(id, state, detail) {
+  const el = document.getElementById(id);
+  el.className = `verify-step ${state}`;
+  const detailEl = document.getElementById(`${id}-detail`);
+  if (detailEl && detail) detailEl.textContent = detail;
+}
+
+async function simulateAndSubmit(formData) {
+  const overlay = document.getElementById('verification-overlay');
+  overlay.classList.add('show');
+
+  // Reset all steps
+  VS_STEPS.forEach(s => setVerifyStep(s, '', 'Waiting...'));
+
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+
+  // Step 1: OCR
+  setVerifyStep('vs-ocr', 'running', 'Scanning Aadhaar card...');
+  await delay(800);
+
+  // Step 2: Face
+  setVerifyStep('vs-face', 'running', 'Extracting facial landmarks...');
+  await delay(200);
+
+  try {
+    console.log('Submitting verification form...');
+    const response = await fetch('/visitor_verification/verify/', {
+      method: 'POST',
+      body: formData,
+    });
+
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+    }
+
+    // Simulate incremental step reveals while waiting
+    await delay(600);
+    setVerifyStep('vs-resident', 'running', 'Querying resident database...');
+    await delay(400);
+    setVerifyStep('vs-nlp', 'running', 'Running NLP intent classifier...');
+
+    const data = await response.json();
+    console.log('Backend response:', data);
+    await delay(500);
+
+    // Process results from API response
+    const stages = data.stages || {};
+
+    // OCR result
+    const ocr = stages.aadhaar_ocr || {};
+    setVerifyStep('vs-ocr', ocr.passed ? 'pass' : 'fail',
+      ocr.passed ? `✓ ${ocr.name || 'Adhaar extracted & Verified'} — ${ocr.aadhaar_number || ''}` : `✗ ${ocr.message || 'Could not read Aadhaar card'}`);
+
+    await delay(300);
+
+    // Face result
+    const face = stages.face_verification || {};
+    setVerifyStep('vs-face', face.passed ? 'pass' : 'fail',
+      face.passed
+        ? `✓ Match: ${face.confidence?.toFixed(1)}% confidence`
+        : `✗ ${face.message || 'Face mismatch detected'}`);
+
+    await delay(300);
+
+    // Resident result
+    const res = stages.resident_check || {};
+    setVerifyStep('vs-resident', res.passed ? 'pass' : 'fail',
+      res.passed
+        ? `✓ ${res.resident_name || 'Resident'} is available`
+        : `✗ ${res.message || 'Resident is ' + (res.status || 'unavailable')}`);
+
+    await delay(300);
+
+    // NLP result
+    const nlp = stages.purpose_analysis || {};
+    setVerifyStep('vs-nlp', nlp.passed ? 'pass' : 'fail',
+      nlp.passed
+        ? `✓ Category: ${nlp.category} · Risk: ${(nlp.risk_score * 100).toFixed(0)}%`
+        : `✗ ${nlp.message || 'Purpose flagged as risky'}`);
+
+    await delay(400);
+
+    // QR result
+    if (data.success && data.qr_generated) {
+      setVerifyStep('vs-qr', 'pass', `✓ QR sent to email · Valid until ${data.qr_valid_until ? new Date(data.qr_valid_until).toLocaleTimeString() : 'later'}`);
+    } else {
+      setVerifyStep('vs-qr', 'fail', `✗ ${data.message || 'QR not generated — checks failed'}`);
+    }
+
+    await delay(300);
+
+    // Show result section
+    showResult(data, stages);
+
+  } catch (err) {
+    console.error('Verification error:', err);
+    
+    // Show error state
+    const spinner = document.getElementById('verify-spinner');
+    const title = document.getElementById('verify-title');
+    const subtitle = document.getElementById('verify-subtitle');
+    const section = document.getElementById('result-section');
+    
+    spinner.className = 'verify-spinner fail';
+    spinner.textContent = '⚠️';
+    title.textContent = 'Verification Error';
+    title.style.color = 'var(--red)';
+    subtitle.textContent = err.message;
+    
+    section.innerHTML = `
+      <div class="denied-banner">
+        <div class="denied-icon">⚠️</div>
+        <div class="denied-text">Error During Verification</div>
+        <div class="denied-reason">${err.message || 'An error occurred while processing your request. Please try again.'}</div>
+      </div>
+      <button class="btn btn-danger" onclick="closeOverlay()" style="margin-bottom:8px">🔄 Try Again</button>
+    `;
+    section.classList.add('show');
+  }
+}
+
+async function simulateDemoResult() {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const isApproved = Math.random() > 0.35;
+
+  await delay(400);
+  setVerifyStep('vs-ocr', 'pass', '✓ Ravi Kumar — 7890 XXXX 1234');
+  await delay(300);
+  setVerifyStep('vs-face', isApproved ? 'pass' : 'fail',
+    isApproved ? '✓ Face Match: 91.4% confidence' : '✗ Face mismatch — distance: 0.72');
+  await delay(300);
+  setVerifyStep('vs-resident', 'pass', '✓ Arjun Sharma is at home');
+  await delay(300);
+  setVerifyStep('vs-nlp', 'pass', '✓ Category: delivery service · Risk: 2%');
+  await delay(400);
+  if (isApproved) {
+    setVerifyStep('vs-qr', 'pass', '✓ QR generated · Valid until 10:30 PM');
+  } else {
+    setVerifyStep('vs-qr', 'fail', '✗ Cannot issue QR — identity mismatch');
+  }
+  await delay(300);
+  showDemoResult(isApproved);
+}
+
+function showDemoResult(approved) {
+  const spinner = document.getElementById('verify-spinner');
+  const title   = document.getElementById('verify-title');
+  const subtitle= document.getElementById('verify-subtitle');
+  const section = document.getElementById('result-section');
+
+  if (approved) {
+    spinner.className = 'verify-spinner done';
+    spinner.textContent = '✓';
+    title.textContent  = 'Access Granted';
+    title.style.color  = 'var(--green)';
+    subtitle.textContent = 'All checks passed · QR sent to email';
+
+    section.innerHTML = `
+      <div class="qr-card">
+        <div id="qr-display">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=SMARTGATE_TOKEN_DEMO_${Date.now()}&color=0f0f23" alt="QR Code"/>
+        </div>
+        <div class="qr-label">VISITOR ACCESS PASS — SCAN AT GATE</div>
+        <div class="qr-token">TOKEN: VX-${Math.random().toString(36).substring(2, 10).toUpperCase()}</div>
+      </div>
+      <div class="result-meta">
+        <div class="result-meta-item">
+          <div class="rmi-label">Face Confidence</div>
+          <div class="rmi-value success">91.4%</div>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:91%"></div></div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">Purpose Risk</div>
+          <div class="rmi-value success">2%</div>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:2%"></div></div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">QR Valid For</div>
+          <div class="rmi-value warn">4 hours</div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">Email Status</div>
+          <div class="rmi-value success">Sent ✓</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="closeOverlay()" style="margin-bottom:8px">← New Visitor</button>
+    `;
+  } else {
+    spinner.className = 'verify-spinner fail';
+    spinner.textContent = '✗';
+    title.textContent  = 'Access Denied';
+    title.style.color  = 'var(--red)';
+    subtitle.textContent = 'Identity verification failed';
+
+    section.innerHTML = `
+      <div class="denied-banner">
+        <div class="denied-icon">🚫</div>
+        <div class="denied-text">Access Denied</div>
+        <div class="denied-reason">Live face does not match the Aadhaar card photo. Please contact the security office if you believe this is an error.</div>
+      </div>
+      <div class="result-meta">
+        <div class="result-meta-item">
+          <div class="rmi-label">Face Match</div>
+          <div class="rmi-value danger">28%</div>
+          <div class="confidence-bar"><div class="confidence-fill low" style="width:28%"></div></div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">Threshold</div>
+          <div class="rmi-value warn">≥ 45%</div>
+        </div>
+      </div>
+      <button class="btn btn-danger" onclick="closeOverlay()" style="margin-bottom:8px">🔄 Try Again</button>
+    `;
+  }
+  section.classList.add('show');
+}
+
+function showResult(data, stages) {
+  const spinner = document.getElementById('verify-spinner');
+  const title   = document.getElementById('verify-title');
+  const subtitle= document.getElementById('verify-subtitle');
+  const section = document.getElementById('result-section');
+
+  if (data.success) {
+    spinner.className = 'verify-spinner done';
+    spinner.textContent = '✓';
+    title.textContent  = 'Access Granted';
+    title.style.color  = 'var(--green)';
+    subtitle.textContent = 'All checks passed · QR sent to email';
+
+    const qrImg = data.qr_base64
+      ? `<img src="data:image/png;base64,${data.qr_base64}" alt="QR Code"/>`
+      : `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${data.visit_id}" alt="QR"/>`;
+
+    const faceScore = stages.face_verification?.confidence || 0;
+    const riskScore = (stages.purpose_analysis?.risk_score || 0) * 100;
+    const parkingSlot = data.parking_slot?.slot_number || '—';
+    const parkingLocation = data.parking_slot?.location || '';
+
+    let parkingHTML = `
+        <div class="result-meta-item">
+          <div class="rmi-label">Parking Slot</div>
+          <div class="rmi-value success">${parkingSlot}</div>
+          ${parkingLocation ? `<div class="rmi-detail">${parkingLocation}</div>` : ''}
+        </div>
+    `;
+
+    section.innerHTML = `
+      <div class="qr-card">
+        <div id="qr-display">${qrImg}</div>
+        <div class="qr-label">VISITOR ACCESS PASS — SCAN AT GATE</div>
+        <div class="qr-token">TOKEN: ${data.visit_id?.substring(0,13).toUpperCase()}</div>
+      </div>
+      <div class="result-meta">
+        <div class="result-meta-item">
+          <div class="rmi-label">Face Confidence</div>
+          <div class="rmi-value success">${faceScore.toFixed(1)}%</div>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:${faceScore}%"></div></div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">Purpose Risk</div>
+          <div class="rmi-value success">${riskScore.toFixed(0)}%</div>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:${riskScore}%"></div></div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">QR Valid Until</div>
+          <div class="rmi-value warn">${data.qr_valid_until ? new Date(data.qr_valid_until).toLocaleTimeString() : '—'}</div>
+        </div>
+        <div class="result-meta-item">
+          <div class="rmi-label">Email Status</div>
+          <div class="rmi-value success">${data.email_sent ? 'Sent ✓' : 'Pending'}</div>
+        </div>
+        ${parkingSlot !== '—' ? parkingHTML : ''}
+      </div>
+      <button class="btn btn-outline" onclick="closeOverlay()" style="margin-bottom:8px">← New Visitor</button>
+    `;
+  } else {
+    spinner.className = 'verify-spinner fail';
+    spinner.textContent = '✗';
+    title.textContent  = 'Access Denied';
+    title.style.color  = 'var(--red)';
+    subtitle.textContent = data.message || 'Verification failed';
+
+    const reasonMap = {
+      face_failed: 'Live face does not match the Aadhaar card photo.',
+      resident_unavailable: 'The resident you are visiting is not currently available.',
+      purpose_rejected: 'Your stated purpose was flagged as suspicious by our AI system.',
+      blocked: 'This Aadhaar number is on the community blocked list.',
+    };
+
+    section.innerHTML = `
+      <div class="denied-banner">
+        <div class="denied-icon">🚫</div>
+        <div class="denied-text">Access Denied</div>
+        <div class="denied-reason">${reasonMap[data.stage] || data.message || 'Please contact the security office.'}</div>
+      </div>
+      <button class="btn btn-danger" onclick="closeOverlay()" style="margin-bottom:8px">🔄 Try Again</button>
+    `;
+  }
+
+  section.classList.add('show');
+}
+
+function closeOverlay() {
+  document.getElementById('verification-overlay').classList.remove('show');
+  document.getElementById('result-section').classList.remove('show');
+  document.getElementById('result-section').innerHTML = '';
+  // Reset spinner
+  const spinner = document.getElementById('verify-spinner');
+  spinner.className = 'verify-spinner';
+  spinner.textContent = '🔐';
+  document.getElementById('verify-title').textContent = 'Verifying Identity';
+  document.getElementById('verify-title').style.color = '';
+  document.getElementById('verify-subtitle').textContent = 'Running security checks...';
+}
+
+// ── FORM SUBMIT ───────────────────────────────────────────────────────────────
+document.getElementById('verification-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Validation
+  const errors = [];
+  if (!capturedPhotoBase64) errors.push('Please capture a live photo first');
+  if (!document.getElementById('aadhaar_image').files[0]) errors.push('Please upload Aadhaar card');
+  if (!selectedResident) errors.push('Please select a resident to visit');
+  if (!document.getElementById('purpose').value.trim()) errors.push('Please describe your purpose');
+  if (!document.getElementById('visitor_name').value.trim()) errors.push('Please enter visitor name');
+  if (!document.getElementById('phone').value.trim()) errors.push('Please enter phone number');
+
+  if (errors.length) {
+    errors.forEach(err => showToast('error', '⚠️', err));
+    return;
+  }
+
+  const formData = new FormData(e.target);
+
+  await simulateAndSubmit(formData);
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(type, icon, message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const colors = { success: 'var(--green)', error: 'var(--red)', warning: 'var(--amber)', info: 'var(--cyan)' };
+  toast.className = `toast ${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}`;
+  toast.innerHTML = `
+    <span style="font-size:1rem">${icon}</span>
+    <span style="flex:1;color:var(--text-dim)">${message}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem">×</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+setStepActive(1);
+renderSuggestions(document.getElementById('purpose-tags'));
+
+// Load residents data from backend<div class="resident-name">${r.name}</div>
+loadResidents();
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+setStepActive(1);
+renderSuggestions(document.getElementById('purpose-tags'));
+</script>
+</body>
+</html>

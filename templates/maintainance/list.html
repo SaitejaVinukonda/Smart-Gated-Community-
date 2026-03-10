@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Maintenance Requests{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h3 mb-1 gradient-text">
+                    <i class="fa-solid fa-list me-2"></i>
+                    Maintenance Requests
+                </h1>
+                <p class="text-light mb-0">{{ requests.count }} total requests</p>
+            </div>
+            {% if user.role == 'RESIDENT' %}
+            <a href="{% url 'create_request' %}" class="btn btn-success">
+                <i class="fa-solid fa-plus me-2"></i>New Request
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Requests Table -->
+        <div class="card card-glass shadow-lg">
+            <div class="card-body p-0">
+                {% if requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead style="background: rgba(255,255,255,0.1);">
+                            <tr>
+                                <th class="text-white">Title</th>
+                                <th class="text-white">Status</th>
+                                <th class="text-white">Priority</th>
+                                <th class="text-white">Category</th>
+                                <th class="text-white">Created</th>
+                                <th class="text-white text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in requests %}
+                            <tr class="align-middle">
+                                <td class="text-white fw-semibold">{{ req.title|truncatechars:40 }}</td>
+                                <td>
+                                    <span class="badge" style="background: 
+                                        {% if req.status == 'PENDING' %}#f59e0b
+                                        {% elif req.status == 'ASSIGNED' %}#10b981
+                                        {% elif req.status == 'COMPLETED' %}#059669
+                                        {% else %}#ef4444{% endif %};
+                                        color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem;">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge priority-{{ req.priority }}" style="background: 
+                                        {% if req.priority == 1 %}#d1fae5; color: #065f46;
+                                        {% elif req.priority == 2 %}#fef3c7; color: #92400e;
+                                        {% elif req.priority == 3 %}#fed7aa; color: #c2410c;
+                                        {% else %}#fecaca; color: #991b1b;{% endif %}
+                                        padding: 0.4rem 0.8rem; border-radius: 15px;">
+                                        {{ req.priority }}/4
+                                    </span>
+                                </td>
+                                <td class="text-light">{{ req.category }}</td>
+                                <td class="text-light">{{ req.created_at|date:"M d, g:i A" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'maintenance_detail' req.pk %}" class="btn btn-sm btn-outline-light">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-clipboard-list fa-3x text-light mb-3" style="opacity: 0.5;"></i>
+                    <h4 class="text-light mb-1">No requests found</h4>
+                    {% if user.role == 'RESIDENT' %}
+                    <a href="{% url 'create_request' %}" class="btn btn-success mt-3">
+                        <i class="fa-solid fa-plus me-2"></i>Create First Request
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

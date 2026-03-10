@@ -1,77 +1,279 @@
 {% extends "base.html" %}
-{% block title %}My Maintenance Tasks{% endblock %}
+{% block title %}My Tasks{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --glass-blur: blur(25px);
+        --shadow-lg: 0 25px 70px rgba(0, 0, 0, 0.4);
+        --table-bg: rgba(20, 20, 40, 0.9);
+        --table-row: rgba(255, 255, 255, 0.08);
+        --table-hover: rgba(255, 255, 255, 0.15);
+        --dark-purple: #6B46C1;
+        --dark-purple-light: #8B5CF6;
+        --dark-purple-dark: #553C9A;
+        --gradient-success: linear-gradient(135deg, #10b981, #059669);
+        --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    /* DARK PURPLE TABLE */
+    .glass-table {
+        background: var(--table-bg);
+        backdrop-filter: blur(30px);
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .glass-table-header {
+        background: rgba(107, 70, 193, 0.95) !important; /* Dark Purple */
+        backdrop-filter: blur(25px) !important;
+        border-bottom: 2px solid rgba(139, 92, 246, 0.4) !important;
+    }
+    
+    .glass-table-header th {
+        color: #7c0491fa !important; /* White text for contrast */
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(169, 6, 191, 0.7) !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 1px !important;
+        padding: 1.2rem 0.8rem !important;
+    }
+    
+    .glass-table-row {
+        background: var(--table-row) !important;
+        backdrop-filter: blur(15px) !important;
+        border-bottom: 1px solid rgba(107, 70, 193, 0.2) !important; /* Purple border */
+        transition: all 0.3s ease !important;
+    }
+    
+    .glass-table-row:hover {
+        background: var(--table-hover) !important;
+        border-bottom-color: var(--dark-purple-light) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 25px rgba(107, 70, 193, 0.3) !important; /* Purple shadow */
+    }
+    
+    .glass-table-cell {
+        color: var(--dark-purple) !important; /* DARK PURPLE TEXT */
+        backdrop-filter: blur(10px) !important;
+        padding: 1rem 0.8rem !important;
+        border: none !important;
+        text-shadow: 0 1px 2px rgba(58, 4, 86, 0.3) !important;
+        font-weight: 500 !important;
+    }
+    
+    .glass-table-cell .text-light,
+    .glass-table-cell small {
+        color: var(--dark-purple-light) !important; /* Lighter purple for secondary */
+    }
+    
+    .glass-table-cell .fw-semibold {
+        color: #330140 !important; /* White for bold text */
+    }
+    
+    .btn-task-action {
+        padding: 0.6rem 1.2rem !important;
+        font-weight: 700 !important;
+        border-radius: 20px !important;
+        border: none !important;
+        font-size: 0.85rem !important;
+        height: 42px !important;
+        box-shadow: 0 6px 20px rgba(63, 3, 75, 0.4) !important;
+    }
+    
+    .btn-accept-task { 
+        background: var(--gradient-success) !important; 
+        color: #ffffff !important;
+    }
+    
+    .btn-reject-task { 
+        background: var(--gradient-danger) !important; 
+        color: #ffffff !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h1 class="h3 mb-1 gradient-text">My Assigned Tasks</h1>
-            <p class="text-secondary mb-0">
-                Tasks automatically allocated to you by the ML scheduler.
-            </p>
-        </div>
-    </div>
-
-    {% if assignments %}
-        <div class="row g-3">
-            {% for a in assignments %}
-                <div class="col-md-6">
-                    <a href="{% url 'maintenance_detail' a.request.id %}">
-                        <div class="card card-glass shadow-sm border-0 h-100">
-                            <div class="card-body p-3 p-md-4">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h2 class="h6 mb-0 text-light">
-                                        <i class="fa-solid fa-wrench me-2 text-success"></i>
-                                        {{ a.request.title }}
-                                    </h2>
-                                    <span class="badge
-                                        {% if a.request.status == 'OPEN' %}bg-warning text-dark
-                                        {% elif a.request.status == 'ASSIGNED' %}bg-info text-dark
-                                        {% elif a.request.status == 'IN_PROGRESS' %}bg-primary
-                                        {% else %}bg-success{% endif %}">
-                                        {{ a.request.get_status_display }}
-                                    </span>
-                                </div>
-                                <p class="text-secondary small mb-2">
-                                    {{ a.request.description|truncatechars:120 }}
-                                </p>
-                                <div class="row small text-secondary">
-                                    <div class="col-6">
-                                        <span class="d-block">Resident</span>
-                                        <span class="text-light">{{ a.request.resident.username }}</span>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="d-block">Priority</span>
-                                        <span class="text-light">{{ a.request.get_priority_display }}</span>
-                                    </div>
-                                </div>
-                                <div class="row small text-secondary mt-2">
-                                    <div class="col-6">
-                                        <span class="d-block">Assigned at</span>
-                                        <span class="text-light">{{ a.assigned_at }}</span>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="d-block">ML score</span>
-                                        <span class="text-info fw-semibold">
-                                            {{ a.score|floatformat:3 }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="card card-glass shadow-sm border-0">
-            <div class="card-body p-4">
-                <p class="text-secondary mb-0">
-                    No tasks assigned to you yet. Once the system allocates a request to you,
-                    it will appear here.
+<div class="py-5">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h3 mb-1 gradient-text">
+                    <i class="fa-solid fa-tasks me-2"></i>
+                    My Tasks ({{ assignments.count }})
+                </h1>
+                <p class="text-light mb-0">
+                    <strong>Today:</strong> {{ today_count }} / 3 tasks 
+                    {% if can_accept_more %}
+                        <span class="text-success">✅ Can accept more</span>
+                    {% else %}
+                        <span class="text-danger">🚫 Daily limit reached</span>
+                    {% endif %}
                 </p>
             </div>
         </div>
-    {% endif %}
+
+        <!-- Workload Cards -->
+        <div class="row mb-5 g-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="card glass-card text-center p-4 h-100">
+                    <div class="display-6 gradient-text mb-1">{{ total_count|default:0 }}</div>
+                    <div class="text-light">Total</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card glass-card text-center p-4 h-100">
+                    <div class="display-6 text-success mb-1">{{ today_count|default:0 }}</div>
+                    <div class="text-light">Today</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card glass-card text-center p-4 h-100">
+                    <div class="display-6 text-warning mb-1">{{ pending_count|default:0 }}</div>
+                    <div class="text-light">Pending</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card glass-card p-4 h-100">
+                    <h6 class="text-white mb-2">📊 Capacity</h6>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ daily_workload|floatformat:0 }}0%; background: linear-gradient(90deg, #10b981, #f59e0b);"
+                             aria-valuenow="{{ daily_workload }}" aria-valuemin="0" aria-valuemax="3">
+                            {{ daily_workload }}/3
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- DARK PURPLE GLASS TABLE -->
+        {% if assignments %}
+        <div class="glass-card shadow-lg">
+            <div class="glass-table">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="glass-table-header">
+                            <tr>
+                                <th class="glass-table-cell fw-bold">
+                                    <i class="fa-solid fa-list-check me-2"></i>Task
+                                </th>
+                                <th class="glass-table-cell fw-bold">
+                                    <i class="fa-solid fa-star me-2"></i>Priority
+                                </th>
+                                <th class="glass-table-cell fw-bold">
+                                    <i class="fa-solid fa-user me-2"></i>Resident
+                                </th>
+                                <th class="glass-table-cell fw-bold">
+                                    <i class="fa-solid fa-clock me-2"></i>Assigned
+                                </th>
+                                <th class="glass-table-cell fw-bold">
+                                    <i class="fa-solid fa-gauge-high me-2"></i>Progress
+                                </th>
+                                <th class="glass-table-cell fw-bold text-end">
+                                    <i class="fa-solid fa-gears me-2"></i>Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr class="glass-table-row align-middle">
+                                <td class="glass-table-cell fw-semibold">
+                                    <i class="fa-solid fa-screwdriver-wrench me-2 text-info"></i>
+                                    {{ assignment.request.title|truncatechars:30 }}
+                                </td>
+                                <td class="glass-table-cell">
+                                    <span class="badge fw-bold px-3 py-2" style="background: 
+                                        {% if assignment.request.priority == 1 %}linear-gradient(135deg, #10b981, #059669)
+                                        {% elif assignment.request.priority == 2 %}linear-gradient(135deg, #f59e0b, #d97706)
+                                        {% elif assignment.request.priority == 3 %}linear-gradient(135deg, #ef4444, #dc2626)
+                                        {% else %}linear-gradient(135deg, #8b5cf6, #7c3aed){% endif %};
+                                        color: white; border-radius: 20px; font-size: 0.8rem;">
+                                        {{ assignment.request.priority }}/4
+                                    </span>
+                                </td>
+                                <td class="glass-table-cell">
+                                    {{ assignment.request.resident.get_full_name }}
+                                    <br><small>{{ assignment.request.resident.phone|default:"No phone" }}</small>
+                                </td>
+                                <td class="glass-table-cell">
+                                    {{ assignment.assigned_at|date:"M d, g:i A" }}
+                                </td>
+                                <td class="glass-table-cell">
+                                    {% if assignment.predicted_start_time is None %}
+                                        <span class="badge fw-semibold px-3 py-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 20px;">
+                                            <i class="fa-solid fa-clock me-1"></i>New
+                                        </span>
+                                    {% elif assignment.predicted_end_time is None %}
+                                        <span class="badge fw-semibold px-3 py-2" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border-radius: 20px;">
+                                            <i class="fa-solid fa-play me-1"></i>In Progress
+                                        </span>
+                                    {% else %}
+                                        <span class="badge fw-semibold px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 20px;">
+                                            <i class="fa-solid fa-check me-1"></i>Completed
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="glass-table-cell text-end">
+                                    {% if assignment.predicted_start_time is None %}
+                                        <form method="post" action="{% url 'task_action' assignment.id %}" style="display:inline-block; margin-right:8px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="accept">
+                                            <button type="submit" class="btn-task-action btn-accept-task">
+                                                <i class="fa fa-check me-1"></i>Accept
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'task_action' assignment.id %}" style="display:inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn-task-action btn-reject-task">
+                                                <i class="fa fa-times me-1"></i>Reject
+                                            </button>
+                                        </form>
+                                    {% elif assignment.predicted_end_time is None %}
+                                        <a href="{% url 'staff_complete_task' assignment.id %}" class="btn btn-success btn-sm fw-bold px-3 py-2 me-2" style="border-radius: 18px;">
+                                            <i class="fa-solid fa-flag-checkered me-1"></i>Complete
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-success px-3 py-2 fw-bold me-2" style="border-radius: 18px; background: var(--gradient-success) !important;">✅ Done</span>
+                                    {% endif %}
+                                    <a href="{% url 'maintenance_detail' assignment.request.id %}" class="btn btn-outline-light btn-sm px-3 py-2" style="border-radius: 18px;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="card glass-card p-5">
+                <i class="fa-solid fa-clipboard-list fa-3x text-light mb-3" style="opacity: 0.5;"></i>
+                <h4 class="text-light mb-3">No tasks assigned yet</h4>
+                <p class="text-light mb-4">You're ready to receive maintenance requests!</p>
+                <p class="text-light mb-0">
+                    <strong>Daily Limit:</strong> {{ daily_workload }} / 3 
+                    {% if can_accept_more %}<span class="text-success">✅ Available</span>{% endif %}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

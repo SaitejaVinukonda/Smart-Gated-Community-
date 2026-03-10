@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'visitors',
-    'maintainance'
+    'maintainance',
+    'visitor_verification',
+    'visitor_verify',
 
 ]
 
@@ -73,7 +75,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'community.wsgi.application'
 
-
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -108,8 +112,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+LOCALE_PATHS = [BASE_DIR / 'locale']
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -125,3 +129,65 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 AUTH_USER_MODEL = "accounts.User"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+EMAIL_HOST_USER = 'saitejavinukonda684@gmail.com'
+EMAIL_HOST_PASSWORD = 'jwfhyekenmxbbvmb'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+LOGIN_URL = 'login'
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'security_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'security_audit.log',
+        },
+    },
+    'loggers': {
+        'security_audit': {
+            'handlers': ['security_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+# settings.py - Add at bottom
+import pytesseract
+
+# Windows Tesseract path (CRITICAL)
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+# Test on Django startup
+try:
+    print(f"✅ Tesseract version: {pytesseract.get_tesseract_version()}")
+except Exception as e:
+    print(f"❌ Tesseract ERROR: {e}")
+# ─── Logging ──────────────────────────────────────────────────
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'visitor_verification.log'),
+        },
+    },
+    'loggers': {
+        'visitor_verification': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    },
+}
+ 
+# ─── Session for multi-step verification ─────────────────────
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 3600  # 1 hour
+ 

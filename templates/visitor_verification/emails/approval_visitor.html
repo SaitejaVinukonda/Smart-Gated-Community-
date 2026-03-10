@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+  .card { background: white; max-width: 560px; margin: 0 auto; border-radius: 16px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.1); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #0f0f23 0%, #1a1a4e 100%);
+             padding: 32px; text-align: center; color: white; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .badge { display: inline-block; background: #22c55e; color: white;
+           border-radius: 24px; padding: 6px 20px; font-size: 14px; margin-top: 12px; }
+  .body { padding: 32px; }
+  .row { display: flex; justify-content: space-between; padding: 12px 0;
+          border-bottom: 1px solid #f1f5f9; }
+  .label { color: #64748b; font-size: 13px; }
+  .value { font-weight: 600; color: #1e293b; }
+  .qr-section { text-align: center; padding: 24px; background: #f8fafc; border-radius: 12px; margin: 24px 0; }
+  .footer { padding: 20px 32px; background: #f8fafc; text-align: center;
+             color: #94a3b8; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>🏛️ SmartGate</h1>
+    <div class="badge">✅ ACCESS GRANTED</div>
+  </div>
+  <div class="body">
+    <p>Hello <strong>{{ visitor_name }}</strong>,</p>
+    <p>Your visit has been verified and approved. Please show the attached QR code at the gate.</p>
+    <div class="row">
+      <span class="label">Visiting</span>
+      <span class="value">{{ resident_name }}</span>
+    </div>
+    <div class="row">
+      <span class="label">Location</span>
+      <span class="value">{{ flat }}</span>
+    </div>
+    <div class="row">
+      <span class="label">Purpose</span>
+      <span class="value">{{ purpose }}</span>
+    </div>
+    <div class="row">
+      <span class="label">Valid Until</span>
+      <span class="value">{{ valid_until }}</span>
+    </div>
+    <div class="row">
+      <span class="label">Face Match</span>
+      <span class="value">{{ face_confidence|floatformat:1 }}%</span>
+    </div>
+    <div class="qr-section">
+      <p style="color:#64748b; margin-top:0;">QR Code attached to this email</p>
+      <p style="font-size: 12px; color: #94a3b8;">Token: {{ token }}</p>
+    </div>
+  </div>
+  <div class="footer">SmartGate Visitor Management System • This QR is valid for single use only.</div>
+</div>
+</body>
+</html>

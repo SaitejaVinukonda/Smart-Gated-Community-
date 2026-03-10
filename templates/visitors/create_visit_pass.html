@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- iOS Safari Camera Permissions -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-status-bar-style" content="black-translucent">
+    <title>🛡️ 6-Layer AI Security Gate</title>
+    <style>
+            /* ========== RESET ========== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #1f2937;
+        --accent: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --light-bg: #f8fafc;
+        --border: #e5e7eb;
+        --text-dark: #111827;
+        --text-light: #6b7280;
+    }
+
+    /* ========== BODY ========== */
+    body {
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background: var(--light-bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    /* ========== MAIN CARD ========== */
+    .gate-container {
+        background: #ffffff;
+        width: 100%;
+        max-width: 720px;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+    }
+
+    /* ========== HEADER ========== */
+    h1 {
+        text-align: center;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-light);
+        margin-bottom: 35px;
+    }
+
+    /* ========== FORM LAYOUT ========== */
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    /* ========== INPUTS ========== */
+    input,
+    select {
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* ========== FILE INPUT ========== */
+    .file-input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        display: none;
+    }
+
+    .file-label {
+        display: block;
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        background: var(--primary);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .file-label:hover {
+        background: #111827;
+    }
+
+    .file-label.success {
+        background: var(--success) !important;
+    }
+
+    /* ========== PREVIEW IMAGE ========== */
+    .preview {
+        width: 100%;
+        max-height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        margin-top: 10px;
+        display: none;
+    }
+
+    /* ========== CAMERA SECTION ========== */
+    video {
+        width: 100%;
+        max-height: 260px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #000;
+    }
+
+    .camera-status {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--success);
+        margin-top: 6px;
+    }
+
+    /* ========== BUTTON ========== */
+    button {
+        margin-top: 10px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+        background: #1d4ed8;
+    }
+
+    button:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    /* ========== RESULTS SECTION ========== */
+    #results {
+        margin-top: 30px;
+        padding: 25px;
+        border-radius: 12px;
+        display: none;
+    }
+
+    .approved {
+        border: 1px solid var(--success);
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .rejected {
+        border: 1px solid var(--danger);
+        background: #fef2f2;
+        color: #7f1d1d;
+    }
+
+    /* ========== LAYER GRID ========== */
+    .layer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .layer-item {
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .layer-good {
+        background: #dcfce7;
+        color: var(--success);
+    }
+
+    .layer-bad {
+        background: #fee2e2;
+        color: var(--danger);
+    }
+
+    /* ========== CONFIDENCE BAR ========== */
+    .confidence-bar {
+        width: 100%;
+        height: 18px;
+        background: #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 12px 0;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.6s ease;
+    }
+
+    .confidence-good {
+        background: var(--success);
+    }
+
+    .confidence-bad {
+        background: var(--danger);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 640px) {
+        .gate-container {
+            padding: 25px;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        button {
+            font-size: 14px;
+        }
+}    
+</style>
+</head>
+<body>
+    <div class="gate-container">
+        <h1>🛡️ 6-Layer Security Gate</h1>
+        <p class="subtitle">XGBoost 99.5% | MediaPipe Face Detection</p>
+
+        <form id="securityForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- will be filled with base64 snapshot on submit -->
+            <input type="hidden" name="live_photo_b64" id="livePhotoHidden" />
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Live Camera -->
+            <div class="space-y-4">
+                <h3 class="text-2xl font-semibold">📸 Live Verification</h3>
+                <video id="video" autoplay muted playsinline 
+                       class="w-full rounded-2xl shadow-2xl border-4 border-blue-500/30"></video>
+                <canvas id="canvas" class="hidden" width="640" height="480"></canvas>
+                <!-- snapshot preview shown after capture -->
+                <img id="livePreview" class="preview" alt="Captured face preview" style="display:none;" />
+                <div id="cameraStatus" class="camera-status" style="display:none;">📷 Camera ready</div>
+            </div>
+            <!-- ID Photo -->
+            <div class="form-group">
+                <label>🆔 ID Document (Layer 2 - Tampering Detection)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="idPhoto" name="id_photo_b64" accept="image/*">
+                    <label for="idPhoto" id="idPhotoLabel" class="file-label">📄 Upload ID Photo</label>
+                </div>
+                <img id="idPreview" class="preview" alt="ID preview">
+                <div id="idStatus" class="camera-status" style="display: none;">✅ ID photo uploaded</div>
+            </div>
+
+            <!-- Form Fields - EXACT Django views.py match -->
+            <div class="form-group">
+                <label for="name">👤 Full Name</label>
+                <input type="text" id="name" name="name" placeholder="John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">📱 Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="9876543210" pattern="\d{10}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_number">🔢 Aadhar / ID Number</label>
+                <input type="text" id="id_number" name="id_number" placeholder="123456789012" required>
+            </div>
+
+            <div class="form-group">
+                <label for="flat_number">🏠 Flat Number</label>
+                <input type="text" id="flat_number" name="flat_number" placeholder="A-101" required>
+            </div>
+
+            <div class="form-group">
+                <label for="purpose">🎯 Purpose of Visit</label>
+                <select id="purpose" name="purpose" required>
+                    <option value="">Select purpose...</option>
+                    <option value="meeting">Meeting Resident</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="family">Family Visit</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="guest">Guest</option>
+                </select>
+            </div>
+
+            <button type="submit" id="verifyBtn">🚀 RUN 6-LAYER VERIFICATION</button>
+        </form>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('securityForm');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const resultsDiv = document.getElementById('results');
+
+            if (!form || !verifyBtn || !resultsDiv) return;
+
+            // Camera and preview elements
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const livePreviewImg = document.getElementById('livePreview');
+            const cameraStatusDiv = document.getElementById('cameraStatus');
+
+            const idPhotoInput = document.getElementById('idPhoto');
+            const idPhotoLabel = document.getElementById('idPhotoLabel');
+            const idPreview = document.getElementById('idPreview');
+            const idStatus = document.getElementById('idStatus');
+
+            // start webcam
+            navigator.mediaDevices.getUserMedia({video: {width: 640, height: 480, facingMode: 'user'}})
+                .then(s => {
+                    stream = s;
+                    video.srcObject = s;
+                    cameraStatusDiv.style.display = 'block';
+                })
+                .catch(err => {
+                    console.error('Camera error:', err);
+                    cameraStatusDiv.textContent = '🚫 Camera unavailable';
+                    cameraStatusDiv.style.color = '#dc3545';
+                    cameraStatusDiv.style.display = 'block';
+                });
+
+            // ID photo preview handler remains unchanged
+            if (idPhotoInput) {
+                idPhotoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            idPreview.src = e.target.result;
+                            idPreview.style.display = 'block';
+                            idPhotoLabel.classList.add('success');
+                            idPhotoLabel.innerHTML = '✅ ID Photo Ready';
+                            idStatus.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // ID photo preview
+            if (idPhotoInput) {
+                idPhotoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            idPreview.src = e.target.result;
+                            idPreview.style.display = 'block';
+                            idPhotoLabel.classList.add('success');
+                            idPhotoLabel.innerHTML = '✅ ID Photo Ready';
+                            idStatus.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Form submission - POST to Django verify_six_layers
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Validate ALL required fields
+                const required = ['name', 'phone', 'id_number', 'flat_number', 'purpose'];
+                for (let id of required) {
+                    const field = document.getElementById(id);
+                    if (!field?.value.trim()) {
+                        alert(`❌ Please fill ${id.replace('_', ' ')}`);
+                        field?.focus();
+                        return;
+                    }
+                }
+
+                // capture webcam snapshot and add to form data
+                try {
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const photoData = canvas.toDataURL('image/jpeg', 0.8);
+                    if (livePreviewImg) {
+                        livePreviewImg.src = photoData;
+                        livePreviewImg.style.display = 'block';
+                    }
+                    // append to FormData
+                    // note backend expects live_photo_b64
+                    form.querySelector('input[name="live_photo_b64"]')?.remove();
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'live_photo_b64';
+                    hidden.value = photoData;
+                    form.appendChild(hidden);
+                } catch (err) {
+                    console.warn('Snapshot failed, continuing without live photo', err);
+                }
+
+                // Show loading
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '🔄 Running 6-Layer AI Analysis...';
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = `
+                    <div style="padding: 30px; text-align: center; color: #007bff;">
+                        <div style="font-size: 24px; margin-bottom: 15px;">🧠 Processing...</div>
+                        <div>📸 Face → 🆔 ID → 🔢 Format → 🎯 Purpose → 🏠 Resident → 📱 Behavior</div>
+                    </div>
+                `;
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch('', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    // SUCCESS - Show 6-layer results
+                    if (result.approved) {
+                        resultsDiv.innerHTML = `
+                            <div class="approved">
+                                <h2 style="margin-bottom: 15px;">✅ ACCESS APPROVED! 🎉</h2>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill confidence-good" 
+                                         style="width: ${(result.confidence * 100)}%"></div>
+                                </div>
+                                <p style="font-size: 18px; margin: 15px 0;">
+                                    <strong>🎯 XGBoost Confidence: ${(result.confidence * 100).toFixed(1)}%</strong>
+                                </p>
+                                <div class="layer-grid">
+                                    ${Object.entries(result.layer_scores || {}).map(([layer, score]) => `
+                                        <div class="layer-item layer-${score > 0.5? 'good' : 'bad'}">
+                                            ${layer}<br><strong>${(score * 100).toFixed(1)}%</strong>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div style="margin-top: 20px; padding: 15px; background: rgba(40,167,69,0.1); border-radius: 10px;">
+                                    <strong>🎫 QR Code Ready! Show to Security Guard</strong>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // FAILED - Show rejection details
+                        resultsDiv.innerHTML = `
+                            <div class="rejected">
+                                <h2 style="margin-bottom: 15px;">❌ ACCESS DENIED 🚫</h2>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill confidence-bad" 
+                                         style="width: ${(result.confidence * 100)}%"></div>
+                                </div>
+                                <p style="font-size: 18px; margin: 15px 0;">
+                                    <strong>⚠️ Failed Layer: ${result.weakest_layer?.toUpperCase() || 'UNKNOWN'}</strong>
+                                </p>
+                                <div class="layer-grid">
+                                    ${Object.entries(result.layer_scores || {}).map(([layer, score]) => `
+                                        <div class="layer-item layer-${score > 0.7 ? 'good' : 'bad'}">
+                                            ${layer}<br><strong>${(score * 100).toFixed(1)}%</strong>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Verification error:', error);
+                    resultsDiv.innerHTML = `
+                        <div class="rejected" style="text-align: center;">
+                            <h2>❌ Server Error</h2>
+                            <p>Verification failed. Please check your inputs and try again.</p>
+                            <details style="margin-top: 10px; text-align: left; font-size: 12px;">
+                                ${error.message}
+                            </details>
+                        </div>
+                    `;
+                } finally {
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = '🚀 RUN 6-LAYER VERIFICATION';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
